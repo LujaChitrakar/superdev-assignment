@@ -15,6 +15,7 @@ pub struct CreateUserRequest {
     pub password: String,
 }
 
+
 #[derive(Debug)]
 pub enum UserError {
     UserExists,
