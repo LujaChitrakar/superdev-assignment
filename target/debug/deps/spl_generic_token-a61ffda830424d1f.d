@@ -1,9 +1,0 @@
-/home/luja/solana/superdev/crypto-payment/purge-assignment/target/debug/deps/spl_generic_token-a61ffda830424d1f.d: /home/luja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/spl-generic-token-1.0.1/src/lib.rs /home/luja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/spl-generic-token-1.0.1/src/associated_token_account.rs /home/luja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/spl-generic-token-1.0.1/src/generic_token.rs /home/luja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/spl-generic-token-1.0.1/src/token.rs /home/luja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/spl-generic-token-1.0.1/src/token_2022.rs
-
-/home/luja/solana/superdev/crypto-payment/purge-assignment/target/debug/deps/libspl_generic_token-a61ffda830424d1f.rmeta: /home/luja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/spl-generic-token-1.0.1/src/lib.rs /home/luja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/spl-generic-token-1.0.1/src/associated_token_account.rs /home/luja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/spl-generic-token-1.0.1/src/generic_token.rs /home/luja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/spl-generic-token-1.0.1/src/token.rs /home/luja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/spl-generic-token-1.0.1/src/token_2022.rs
-
-/home/luja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/spl-generic-token-1.0.1/src/lib.rs:
-/home/luja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/spl-generic-token-1.0.1/src/associated_token_account.rs:
-/home/luja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/spl-generic-token-1.0.1/src/generic_token.rs:
-/home/luja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/spl-generic-token-1.0.1/src/token.rs:
-/home/luja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/spl-generic-token-1.0.1/src/token_2022.rs:
