@@ -1,5 +1,5 @@
-pub mod user;
 pub mod solana;
+pub mod user;
 
-pub use user::*;
 pub use solana::*;
+pub use user::*;

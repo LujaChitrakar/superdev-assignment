@@ -8,19 +8,19 @@ use {
     },
     std::time::Duration,
     tonic::{
+        Request, Response, Status,
         codec::{CompressionEncoding, Streaming},
-        metadata::{errors::InvalidMetadataValue, AsciiMetadataValue, MetadataValue},
+        metadata::{AsciiMetadataValue, MetadataValue, errors::InvalidMetadataValue},
         service::interceptor::InterceptedService,
         transport::channel::{Channel, Endpoint},
-        Request, Response, Status,
     },
-    tonic_health::pb::{health_client::HealthClient, HealthCheckRequest, HealthCheckResponse},
+    tonic_health::pb::{HealthCheckRequest, HealthCheckResponse, health_client::HealthClient},
     yellowstone_grpc_proto::prelude::{
-        geyser_client::GeyserClient, CommitmentLevel, GetBlockHeightRequest,
-        GetBlockHeightResponse, GetLatestBlockhashRequest, GetLatestBlockhashResponse,
-        GetSlotRequest, GetSlotResponse, GetVersionRequest, GetVersionResponse,
-        IsBlockhashValidRequest, IsBlockhashValidResponse, PingRequest, PongResponse,
-        SubscribeReplayInfoRequest, SubscribeReplayInfoResponse, SubscribeRequest, SubscribeUpdate,
+        CommitmentLevel, GetBlockHeightRequest, GetBlockHeightResponse, GetLatestBlockhashRequest,
+        GetLatestBlockhashResponse, GetSlotRequest, GetSlotResponse, GetVersionRequest,
+        GetVersionResponse, IsBlockhashValidRequest, IsBlockhashValidResponse, PingRequest,
+        PongResponse, SubscribeReplayInfoRequest, SubscribeReplayInfoResponse, SubscribeRequest,
+        SubscribeUpdate, geyser_client::GeyserClient,
     },
 };
 

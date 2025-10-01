@@ -6,7 +6,7 @@ edition = "2024"
 [dependencies]
 uuid = { version = "1.0", features = ["v4","serde"] }
 chrono = { version = "0.4", features = ["serde"] }
-sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono"] }
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono","bigdecimal","decimal","migrate",] }
 bcrypt = "0.15"
 tokio = { version = "1.0", features = ["full"] }
 rust_decimal = "1.37.2"

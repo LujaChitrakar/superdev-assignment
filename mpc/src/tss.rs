@@ -1,13 +1,15 @@
 #![allow(non_snake_case)]
 
 use curv::elliptic::curves::{Ed25519, Point, Scalar};
-use multi_party_eddsa::protocols::musig2::{self, PrivatePartialNonces, PublicPartialNonces};
 use multi_party_eddsa::protocols::ExpandedKeyPair;
+use multi_party_eddsa::protocols::musig2::{self, PrivatePartialNonces, PublicPartialNonces};
 use solana_sdk::signature::{Keypair, Signature, Signer, SignerError};
 use solana_sdk::{hash::Hash, pubkey::Pubkey, transaction::Transaction};
 
-use crate::serialization::{AggMessage1, Error as DeserializationError, PartialSignature, SecretAggStepOne};
-use crate::{create_unsigned_transaction, Error};
+use crate::serialization::{
+    AggMessage1, Error as DeserializationError, PartialSignature, SecretAggStepOne,
+};
+use crate::{Error, create_unsigned_transaction};
 
 /// Create the aggregate public key, pass key=None if you don't care about the coefficient
 pub fn key_agg(keys: Vec<Pubkey>, key: Option<Pubkey>) -> Result<musig2::PublicKeyAgg, Error> {
@@ -17,8 +19,13 @@ pub fn key_agg(keys: Vec<Pubkey>, key: Option<Pubkey>) -> Result<musig2::PublicK
             field_name: "keys",
         })
     };
-    let keys: Vec<_> = keys.into_iter().map(convert_keys).collect::<Result<_, _>>()?;
-    let key = key.map(convert_keys).unwrap_or_else(|| Ok(keys[0].clone()))?;
+    let keys: Vec<_> = keys
+        .into_iter()
+        .map(convert_keys)
+        .collect::<Result<_, _>>()?;
+    let key = key
+        .map(convert_keys)
+        .unwrap_or_else(|| Ok(keys[0].clone()))?;
     musig2::PublicKeyAgg::key_aggregation_n(keys, &key).ok_or(Error::KeyPairIsNotInKeys)
 }
 
@@ -29,8 +36,14 @@ pub fn step_one(keypair: Keypair) -> (AggMessage1, SecretAggStepOne) {
     let (private_nonces, public_nonces) = musig2::generate_partial_nonces(&extended_kepair, None);
 
     (
-        AggMessage1 { sender: keypair.pubkey(), public_nonces: public_nonces.clone() },
-        SecretAggStepOne { private_nonces, public_nonces },
+        AggMessage1 {
+            sender: keypair.pubkey(),
+            public_nonces: public_nonces.clone(),
+        },
+        SecretAggStepOne {
+            private_nonces,
+            public_nonces,
+        },
     )
 }
 
@@ -45,7 +58,10 @@ pub fn step_two(
     first_messages: Vec<AggMessage1>,
     secret_state: SecretAggStepOne,
 ) -> Result<PartialSignature, Error> {
-    let other_nonces: Vec<_> = first_messages.into_iter().map(|msg1| msg1.public_nonces.R).collect();
+    let other_nonces: Vec<_> = first_messages
+        .into_iter()
+        .map(|msg1| msg1.public_nonces.R)
+        .collect();
 
     // Generate the aggregate key together with the coefficient of the current keypair
     let aggkey = key_agg(keys, Some(keypair.pubkey()))?;
@@ -80,7 +96,11 @@ pub fn sign_and_broadcast(
     let aggpubkey = Pubkey::new(&*aggkey.agg_public_key.to_bytes(true));
 
     // Make sure all the `R`s are the same
-    if !signatures[1..].iter().map(|s| &s.0.as_ref()[..32]).all(|s| s == &signatures[0].0.as_ref()[..32]) {
+    if !signatures[1..]
+        .iter()
+        .map(|s| &s.0.as_ref()[..32])
+        .all(|s| s == &signatures[0].0.as_ref()[..32])
+    {
         return Err(Error::MismatchMessages);
     }
     let deserialize_R = |s| {
@@ -101,8 +121,10 @@ pub fn sign_and_broadcast(
         my_partial_s: deserialize_s(&signatures[0].0.as_ref()[32..])?,
     };
 
-    let partial_sigs: Vec<_> =
-        signatures[1..].iter().map(|s| deserialize_s(&s.0.as_ref()[32..])).collect::<Result<_, _>>()?;
+    let partial_sigs: Vec<_> = signatures[1..]
+        .iter()
+        .map(|s| deserialize_s(&s.0.as_ref()[32..]))
+        .collect::<Result<_, _>>()?;
 
     // Add the signatures up
     let full_sig = musig2::aggregate_partial_signatures(&first_sig, &partial_sigs);
@@ -136,7 +158,9 @@ struct PartialSigner {
 
 impl Signer for PartialSigner {
     fn try_pubkey(&self) -> Result<Pubkey, SignerError> {
-        Ok(Pubkey::new(&*self.aggregated_pubkey.agg_public_key.to_bytes(true)))
+        Ok(Pubkey::new(
+            &*self.aggregated_pubkey.agg_public_key.to_bytes(true),
+        ))
     }
 
     fn try_sign_message(&self, message: &[u8]) -> Result<Signature, SignerError> {
@@ -188,12 +212,14 @@ mod tests {
         let aggpubkey_solana = Pubkey::new(&*aggpubkey.to_bytes(true));
         let full_amount = 500_000_000;
         // Get some money in it
-        let testnet = TestValidator::with_no_fees(aggpubkey_solana, None, SocketAddrSpace::Unspecified);
+        let testnet =
+            TestValidator::with_no_fees(aggpubkey_solana, None, SocketAddrSpace::Unspecified);
         let rpc_client = testnet.get_rpc_client();
 
         // step 1
         let to = Keypair::generate(&mut rng);
-        let (first_msgs, first_secrets): (Vec<_>, Vec<_>) = keys.iter().map(clone_keypair).map(step_one).unzip();
+        let (first_msgs, first_secrets): (Vec<_>, Vec<_>) =
+            keys.iter().map(clone_keypair).map(step_one).unzip();
 
         let recent_block_hash = rpc_client.get_latest_blockhash().unwrap();
         // step 2
@@ -208,15 +234,34 @@ mod tests {
             .map(|(i, (key, secret))| {
                 let mut first_msgs: Vec<_> = first_msgs.iter().map(clone_serialize).collect();
                 first_msgs.remove(i);
-                step_two(key, amount, to.pubkey(), memo.clone(), recent_block_hash, pubkeys.clone(), first_msgs, secret)
-                    .unwrap()
+                step_two(
+                    key,
+                    amount,
+                    to.pubkey(),
+                    memo.clone(),
+                    recent_block_hash,
+                    pubkeys.clone(),
+                    first_msgs,
+                    secret,
+                )
+                .unwrap()
             })
             .collect();
 
-        let full_tx = sign_and_broadcast(amount, to.pubkey(), memo, recent_block_hash, pubkeys, partial_sigs).unwrap();
+        let full_tx = sign_and_broadcast(
+            amount,
+            to.pubkey(),
+            memo,
+            recent_block_hash,
+            pubkeys,
+            partial_sigs,
+        )
+        .unwrap();
         let sig = rpc_client.send_transaction(&full_tx).unwrap();
 
         // Wait for confirmation
-        rpc_client.confirm_transaction_with_spinner(&sig, &recent_block_hash, rpc_client.commitment()).unwrap();
+        rpc_client
+            .confirm_transaction_with_spinner(&sig, &recent_block_hash, rpc_client.commitment())
+            .unwrap();
     }
 }

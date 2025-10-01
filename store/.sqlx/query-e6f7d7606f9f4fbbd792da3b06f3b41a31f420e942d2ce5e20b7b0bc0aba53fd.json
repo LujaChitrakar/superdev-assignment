@@ -1,0 +1,64 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, user_id, token_mint, token_symbol, balance, decimals, created_at, updated_at\n             FROM token_balances WHERE user_id = $1 ORDER BY token_symbol",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "token_mint",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "token_symbol",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "balance",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 5,
+        "name": "decimals",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "e6f7d7606f9f4fbbd792da3b06f3b41a31f420e942d2ce5e20b7b0bc0aba53fd"
+}

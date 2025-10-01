@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id FROM users WHERE email = $1",
+  "query": "SELECT id FROM mpc_keyshares WHERE user_id = $1 AND mpc_node_id = $2",
   "describe": {
     "columns": [
       {
@@ -11,12 +11,13 @@
     ],
     "parameters": {
       "Left": [
-        "Text"
+        "Uuid",
+        "Int4"
       ]
     },
     "nullable": [
       false
     ]
   },
-  "hash": "4560c237741ce9d4166aecd669770b3360a3ac71e649b293efb88d92c3254068"
+  "hash": "e4df432c40e90d4f6c1d54e4801ca44ff2ed86fed7c51ee67f892882a46c151f"
 }

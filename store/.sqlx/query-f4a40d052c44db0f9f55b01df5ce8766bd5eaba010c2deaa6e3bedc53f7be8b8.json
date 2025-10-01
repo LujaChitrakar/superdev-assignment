@@ -1,0 +1,25 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE token_balances SET balance = balance + $1, updated_at = $2 \n             WHERE user_id = $3 AND token_mint = $4 \n             RETURNING balance",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "balance",
+        "type_info": "Numeric"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Numeric",
+        "Timestamptz",
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "f4a40d052c44db0f9f55b01df5ce8766bd5eaba010c2deaa6e3bedc53f7be8b8"
+}

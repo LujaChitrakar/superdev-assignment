@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE mpc_keyshares SET private_key_share = $1, updated_at = $2 \n             WHERE user_id = $3 AND mpc_node_id = $4",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Timestamptz",
+        "Uuid",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "39dcde70109b55cd65d4e632f3e761a1f2ca46198708ac7ee1b9cee82b344e78"
+}
