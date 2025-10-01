@@ -1,0 +1,5291 @@
+From 3435cf661e7177a05477417c46a26f9319b9606f Mon Sep 17 00:00:00 2001
+From: luja <lujachitrakar156@gmail.com>
+Date: Wed, 1 Oct 2025 09:07:11 +0000
+Subject: [PATCH] assignment
+
+---
+ Cargo.lock                                    | 519 +++++++++++++----
+ backend/Cargo.toml                            |  17 +-
+ backend/src/main.rs                           |  18 +-
+ backend/src/routes/mod.rs                     |   4 +-
+ backend/src/routes/solana.rs                  | 119 +++-
+ backend/src/routes/user.rs                    |  65 ++-
+ indexer/Cargo.toml                            |  26 +-
+ indexer/src/main.rs                           | 241 +++++++-
+ indexer/src/yellowstone.rs                    |  18 +-
+ mpc/Cargo.toml                                |  19 +-
+ mpc/src/error.rs                              |   1 +
+ mpc/src/main.rs                               | 337 ++++++++++-
+ mpc/src/native_token.rs                       |  33 ++
+ mpc/src/serialization.rs                      | 151 ++++-
+ mpc/src/tss.rs                                |  83 ++-
+ ...5ea1daba2ed346eb15a79c62382c589457ec4.json |  70 +++
+ ...3d2b51658cfc7cf2d5e60f9444f77d7a54d3b.json |  16 +
+ ...d4df18de77b436d4d3a3168f54033b2723168.json |  24 +
+ ...2d6592246ecce8ab8f247b39d735adc8a3140.json |  25 +
+ ...c4649661e5da4b3b8836b8ac0a785bb1b0f61.json |  17 -
+ ...e3b5378fc1374a840d14ee237299e1975c6e3.json |  52 ++
+ ...1f0288d937f2da68c1c5101097d3805d5fdb9.json |  20 +
+ ...761a1f2ca46198708ac7ee1b9cee82b344e78.json |  17 +
+ ...70b3360a3ac71e649b293efb88d92c3254068.json |   2 +-
+ ...1ff51ecb9ed76e09e21c818ca1cd93f45d084.json |  53 ++
+ ...64cbce1769118bc2e84ab071d1c8f12e94aab.json |  20 +
+ ...10e7ef44414fef325645a47536ce3bd44c469.json |  23 +
+ ...ed5e505b1837b34b7371f5c547ae6f9db90a5.json |  52 ++
+ ...1642b990c3573426b5ca7c92533f4d87915e1.json |  76 +++
+ ...c12fdc502c55c9bb4f90d64fd38d953e0d5f5.json |  22 +
+ ...1195672a70fbe3d21572c6e65d8df071dad1b.json |  20 +
+ ...64b7383da5cf0d971ad8e3f0e353ffb667492.json |  69 +++
+ ...9f02f619e56001ab5c431112c61679e4117fc.json |  22 +
+ ...2d0773721ecb7595961582a8fb0a0710a588b.json |  58 ++
+ ...f5b4326ad479f830317eb4991de1938dcd9a7.json |  25 +
+ ...64dc410c9aae8ad7efc4a535947238c0b7b6e.json |  71 +++
+ ...2cacb6853825ac61db1ed6cc223956e2924ab.json |  70 +++
+ ...38fb5f8c4332773958ccad4f95d01094ccbe7.json |  76 +++
+ ...88bb7bc762ca4e09d4a0ea3b0b3e863a2b3df.json |  64 +++
+ ...19ed55c097fc7ee46d9f842b48259316790c2.json |  55 ++
+ ...d9a3f8c9df102eb920ded61e43c3e2bcd6d64.json |  22 +
+ ...6edc3f70a4917910cf3b76faefc24ac32159d.json |  20 +
+ ...e0518ddb141ed09643e9f89670a51a8560365.json |  22 +
+ ...ca44ff2ed86fed7c51ee67f892882a46c151f.json |  23 +
+ ...aacdfc0d711abaa18bec4eb3b6890410bf0f5.json |  16 +
+ ...3b41a31f420e942d2ce5e20b7b0bc0aba53fd.json |  64 +++
+ ...89e93732b85ebc5383bfdebd9fe1009343386.json |  24 +
+ ...e8766bd5eaba010c2deaa6e3bedc53f7be8b8.json |  25 +
+ ...2073f0ae95134781b0804d7bd6c2dbbbc65a8.json |  65 +++
+ store/Cargo.toml                              |   2 +-
+ store/src/lib.rs                              |  36 +-
+ store/src/transaction.rs                      | 535 ++++++++++++++++++
+ store/src/user.rs                             | 275 +++++----
+ 53 files changed, 3470 insertions(+), 329 deletions(-)
+ create mode 100644 mpc/src/native_token.rs
+ create mode 100644 store/.sqlx/query-07b1a79bafaeb4dca1fb95570465ea1daba2ed346eb15a79c62382c589457ec4.json
+ create mode 100644 store/.sqlx/query-1153b675498a19ea40fe915b2593d2b51658cfc7cf2d5e60f9444f77d7a54d3b.json
+ create mode 100644 store/.sqlx/query-1c05b63b87f98e4f7f3325c1b8dd4df18de77b436d4d3a3168f54033b2723168.json
+ create mode 100644 store/.sqlx/query-245a0c98288358dbef2d524192f2d6592246ecce8ab8f247b39d735adc8a3140.json
+ delete mode 100644 store/.sqlx/query-264f5c41f0d52f41964fe499431c4649661e5da4b3b8836b8ac0a785bb1b0f61.json
+ create mode 100644 store/.sqlx/query-2e23fc2612dae9583baf9b91496e3b5378fc1374a840d14ee237299e1975c6e3.json
+ create mode 100644 store/.sqlx/query-31e14eff96bef8c7c2a3f1815601f0288d937f2da68c1c5101097d3805d5fdb9.json
+ create mode 100644 store/.sqlx/query-39dcde70109b55cd65d4e632f3e761a1f2ca46198708ac7ee1b9cee82b344e78.json
+ create mode 100644 store/.sqlx/query-546353d46a85076f91c62b23bcc1ff51ecb9ed76e09e21c818ca1cd93f45d084.json
+ create mode 100644 store/.sqlx/query-5bd761e972c34e4bc74d204fde864cbce1769118bc2e84ab071d1c8f12e94aab.json
+ create mode 100644 store/.sqlx/query-6c6c82a6b46becb059d24724fea10e7ef44414fef325645a47536ce3bd44c469.json
+ create mode 100644 store/.sqlx/query-71d607695109d56fcb9fb6ac86fed5e505b1837b34b7371f5c547ae6f9db90a5.json
+ create mode 100644 store/.sqlx/query-82228d1a70211fc89a337b8a4d71642b990c3573426b5ca7c92533f4d87915e1.json
+ create mode 100644 store/.sqlx/query-88f26472e41c0381a8945804164c12fdc502c55c9bb4f90d64fd38d953e0d5f5.json
+ create mode 100644 store/.sqlx/query-96c6d22aa364cdd0e57958f1a311195672a70fbe3d21572c6e65d8df071dad1b.json
+ create mode 100644 store/.sqlx/query-a3983a9ffa865f130d8c4c49f0664b7383da5cf0d971ad8e3f0e353ffb667492.json
+ create mode 100644 store/.sqlx/query-af1d34634511170f850175c28e69f02f619e56001ab5c431112c61679e4117fc.json
+ create mode 100644 store/.sqlx/query-b6fdb095d77e057f758ea5769e52d0773721ecb7595961582a8fb0a0710a588b.json
+ create mode 100644 store/.sqlx/query-be1387b533b85a170b8d5971302f5b4326ad479f830317eb4991de1938dcd9a7.json
+ create mode 100644 store/.sqlx/query-bee698cfe3902c4fcbf54a9b7f264dc410c9aae8ad7efc4a535947238c0b7b6e.json
+ create mode 100644 store/.sqlx/query-c33d08c4381868102736f67e7d22cacb6853825ac61db1ed6cc223956e2924ab.json
+ create mode 100644 store/.sqlx/query-ca2173fbceab2e40561d603e87738fb5f8c4332773958ccad4f95d01094ccbe7.json
+ create mode 100644 store/.sqlx/query-cb40de7df7d25cba877d96f444188bb7bc762ca4e09d4a0ea3b0b3e863a2b3df.json
+ create mode 100644 store/.sqlx/query-d61192941805ec09d7562d0f4a419ed55c097fc7ee46d9f842b48259316790c2.json
+ create mode 100644 store/.sqlx/query-db3465a4a87e5579b6c3518862ed9a3f8c9df102eb920ded61e43c3e2bcd6d64.json
+ create mode 100644 store/.sqlx/query-dc64e1d25d9ced3a49130cee99f6edc3f70a4917910cf3b76faefc24ac32159d.json
+ create mode 100644 store/.sqlx/query-e47922b4c1a8655988b5e732758e0518ddb141ed09643e9f89670a51a8560365.json
+ create mode 100644 store/.sqlx/query-e4df432c40e90d4f6c1d54e4801ca44ff2ed86fed7c51ee67f892882a46c151f.json
+ create mode 100644 store/.sqlx/query-e5ee845473e83a89338e9296e21aacdfc0d711abaa18bec4eb3b6890410bf0f5.json
+ create mode 100644 store/.sqlx/query-e6f7d7606f9f4fbbd792da3b06f3b41a31f420e942d2ce5e20b7b0bc0aba53fd.json
+ create mode 100644 store/.sqlx/query-eb969f732e442ce3b81eba84e0989e93732b85ebc5383bfdebd9fe1009343386.json
+ create mode 100644 store/.sqlx/query-f4a40d052c44db0f9f55b01df5ce8766bd5eaba010c2deaa6e3bedc53f7be8b8.json
+ create mode 100644 store/.sqlx/query-fba1e93b14ac655c9fbba7bab752073f0ae95134781b0804d7bd6c2dbbbc65a8.json
+ create mode 100644 store/src/transaction.rs
+
+diff --git a/Cargo.lock b/Cargo.lock
+index ca7e893..416a9cd 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -252,7 +252,7 @@ version = "2.3.7"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "e35cc5b8887b993ba4975a23b6e098ee10db50e8e23ee3a9523035b7ca35b53b"
+ dependencies = [
+- "ahash",
++ "ahash 0.8.12",
+  "solana-epoch-schedule",
+  "solana-hash",
+  "solana-pubkey",
+@@ -271,6 +271,17 @@ dependencies = [
+  "solana-sdk-ids",
+ ]
+ 
++[[package]]
++name = "ahash"
++version = "0.7.8"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "891477e0c6a8957309ee5c45a6368af3ae14bb510732d2684ffa19af310920f9"
++dependencies = [
++ "getrandom 0.2.16",
++ "once_cell",
++ "version_check",
++]
++
+ [[package]]
+ name = "ahash"
+ version = "0.8.12"
+@@ -464,6 +475,12 @@ version = "0.12.3"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "3441f0f7b02788e948e47f457ca01f1d7e6d92c693bc132c22b087d3141c03ff"
+ 
++[[package]]
++name = "base64"
++version = "0.21.7"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "9d297deb1925b89f2ccc13d7635fa0714f12c87adce1c75356b39ca9b7178567"
++
+ [[package]]
+ name = "base64"
+ version = "0.22.1"
+@@ -489,6 +506,17 @@ dependencies = [
+  "zeroize",
+ ]
+ 
++[[package]]
++name = "bigdecimal"
++version = "0.3.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "a6773ddc0eafc0e509fb60e48dff7f450f8e674a0686ae8605e8d9901bd5eefa"
++dependencies = [
++ "num-bigint",
++ "num-integer",
++ "num-traits",
++]
++
+ [[package]]
+ name = "bincode"
+ version = "1.3.3"
+@@ -507,6 +535,18 @@ dependencies = [
+  "serde",
+ ]
+ 
++[[package]]
++name = "bitvec"
++version = "1.0.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "1bc2832c24239b0141d5674bb9174f9d68a8b5b3f2753311927c172ca46f7e9c"
++dependencies = [
++ "funty",
++ "radium",
++ "tap",
++ "wyz",
++]
++
+ [[package]]
+ name = "blake3"
+ version = "1.8.2"
+@@ -638,6 +678,12 @@ dependencies = [
+  "alloc-stdlib",
+ ]
+ 
++[[package]]
++name = "bs58"
++version = "0.4.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "771fe0050b883fcc3ea2359b1a96bcfbc090b7116eae7c3c512c7a083fdf23d3"
++
+ [[package]]
+ name = "bs58"
+ version = "0.5.1"
+@@ -663,6 +709,28 @@ dependencies = [
+  "serde",
+ ]
+ 
++[[package]]
++name = "bytecheck"
++version = "0.6.12"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "23cdc57ce23ac53c931e88a43d06d070a6fd142f2617be5855eb75efc9beb1c2"
++dependencies = [
++ "bytecheck_derive",
++ "ptr_meta",
++ "simdutf8",
++]
++
++[[package]]
++name = "bytecheck_derive"
++version = "0.6.12"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "3db406d29fbcd95542e92559bed4d8ad92636d1ca8b3b72ede10b4bcc010e659"
++dependencies = [
++ "proc-macro2",
++ "quote",
++ "syn 1.0.109",
++]
++
+ [[package]]
+ name = "bytemuck"
+ version = "1.23.2"
+@@ -753,15 +821,6 @@ dependencies = [
+  "inout",
+ ]
+ 
+-[[package]]
+-name = "concurrent-queue"
+-version = "2.5.0"
+-source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "4ca0197aee26d1ae37445ee532fefce43251d24cc7c166799f4d46817f1d3973"
+-dependencies = [
+- "crossbeam-utils",
+-]
+-
+ [[package]]
+ name = "console_error_panic_hook"
+ version = "0.1.7"
+@@ -1066,7 +1125,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "778e2ac28f6c47af28e4907f13ffd1e1ddbd400980a9abd7c8df189bf578a5ad"
+ dependencies = [
+  "libc",
+- "windows-sys 0.59.0",
++ "windows-sys 0.60.2",
+ ]
+ 
+ [[package]]
+@@ -1082,14 +1141,9 @@ dependencies = [
+ 
+ [[package]]
+ name = "event-listener"
+-version = "5.4.1"
++version = "2.5.3"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "e13b66accf52311f30a0db42147dadea9850cb48cd070028831ae5f5d4b856ab"
+-dependencies = [
+- "concurrent-queue",
+- "parking",
+- "pin-project-lite",
+-]
++checksum = "0206175f82b8d6bf6652ff7d71a1e27fd2e4efde587fd368662814d6ec1d9ce0"
+ 
+ [[package]]
+ name = "fastrand"
+@@ -1187,6 +1241,12 @@ dependencies = [
+  "percent-encoding",
+ ]
+ 
++[[package]]
++name = "funty"
++version = "2.0.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "e6d5a32815ae3f33302d95fdcb2ce17862f8c65363dcfd29360480ba1001fc9c"
++
+ [[package]]
+ name = "futures"
+ version = "0.3.31"
+@@ -1377,33 +1437,56 @@ dependencies = [
+  "tracing",
+ ]
+ 
++[[package]]
++name = "hashbrown"
++version = "0.12.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
++dependencies = [
++ "ahash 0.7.8",
++]
++
+ [[package]]
+ name = "hashbrown"
+ version = "0.13.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "43a3c133739dddd0d2990f9a4bdf8eb4b21ef50e4851ca85ab661199821d510e"
+ dependencies = [
+- "ahash",
++ "ahash 0.8.12",
+ ]
+ 
+ [[package]]
+ name = "hashbrown"
+-version = "0.15.5"
++version = "0.14.5"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "9229cfe53dfd69f0609a49f65461bd93001ea1ef889cd5529dd176593f5338a1"
++checksum = "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1"
+ dependencies = [
++ "ahash 0.8.12",
+  "allocator-api2",
+- "equivalent",
+- "foldhash",
+ ]
+ 
++[[package]]
++name = "hashbrown"
++version = "0.15.5"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "9229cfe53dfd69f0609a49f65461bd93001ea1ef889cd5529dd176593f5338a1"
++
+ [[package]]
+ name = "hashlink"
+-version = "0.10.0"
++version = "0.8.4"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "7382cf6263419f2d8df38c55d7da83da5c18aef87fc7a7fc1fb1e344edfe14c1"
++checksum = "e8094feaf31ff591f651a2664fb9cfd92bba7a60ce3197265e9482ebe753c8f7"
+ dependencies = [
+- "hashbrown 0.15.5",
++ "hashbrown 0.14.5",
++]
++
++[[package]]
++name = "heck"
++version = "0.4.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "95505c38b4572b2d910cecb0281560f54b440a19336cbbcb27bf6ce6adc6f5a8"
++dependencies = [
++ "unicode-segmentation",
+ ]
+ 
+ [[package]]
+@@ -1886,10 +1969,11 @@ dependencies = [
+ 
+ [[package]]
+ name = "libsqlite3-sys"
+-version = "0.30.1"
++version = "0.27.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "2e99fb7a497b1e3339bc746195567ed8d3e24945ecd636e3619d20b9de9e9149"
++checksum = "cf4e226dcd58b4be396f7bd3c20da8fdee2911400705297ba7d2d7cc2c30f716"
+ dependencies = [
++ "cc",
+  "pkg-config",
+  "vcpkg",
+ ]
+@@ -1988,6 +2072,12 @@ version = "0.3.17"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "6877bb514081ee2a7ff5ef9de3281f14a4dd4bceac4c09388074a6b5df8a139a"
+ 
++[[package]]
++name = "minimal-lexical"
++version = "0.2.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
++
+ [[package]]
+ name = "miniz_oxide"
+ version = "0.8.9"
+@@ -2014,7 +2104,7 @@ name = "mpc"
+ version = "0.1.0"
+ dependencies = [
+  "actix-web",
+- "tokio",
++ "bs58 0.4.0",
+ ]
+ 
+ [[package]]
+@@ -2023,6 +2113,16 @@ version = "0.10.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "1d87ecb2933e8aeadb3e3a02b828fed80a7528047e68b4f424523a0981a3a084"
+ 
++[[package]]
++name = "nom"
++version = "7.1.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "d273983c5a657a70a3e8f2a01329822f3b8c8172b73826411a55751e404a0a4a"
++dependencies = [
++ "memchr",
++ "minimal-lexical",
++]
++
+ [[package]]
+ name = "num-bigint"
+ version = "0.4.6"
+@@ -2140,12 +2240,6 @@ version = "0.3.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "c08d65885ee38876c4f86fa503fb49d7b507c2b62552df7c70b2fce627e06381"
+ 
+-[[package]]
+-name = "parking"
+-version = "2.2.1"
+-source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "f38d5652c16fde515bb1ecef450ab0f6a219d619a7274976324d5e377f7dceba"
+-
+ [[package]]
+ name = "parking_lot"
+ version = "0.12.4"
+@@ -2169,6 +2263,12 @@ dependencies = [
+  "windows-targets 0.52.6",
+ ]
+ 
++[[package]]
++name = "paste"
++version = "1.0.15"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a"
++
+ [[package]]
+ name = "pbkdf2"
+ version = "0.11.0"
+@@ -2351,7 +2451,7 @@ version = "0.14.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "ac6c3320f9abac597dcbc668774ef006702672474aad53c6d596b62e487b40b1"
+ dependencies = [
+- "heck",
++ "heck 0.5.0",
+  "itertools 0.14.0",
+  "log",
+  "multimap",
+@@ -2398,6 +2498,26 @@ dependencies = [
+  "autotools",
+ ]
+ 
++[[package]]
++name = "ptr_meta"
++version = "0.1.4"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "0738ccf7ea06b608c10564b31debd4f5bc5e197fc8bfe088f68ae5ce81e7a4f1"
++dependencies = [
++ "ptr_meta_derive",
++]
++
++[[package]]
++name = "ptr_meta_derive"
++version = "0.1.4"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "16b845dbfca988fa33db069c0e230574d15a3088f147a87b64c7589eb662c9ac"
++dependencies = [
++ "proc-macro2",
++ "quote",
++ "syn 1.0.109",
++]
++
+ [[package]]
+ name = "pulldown-cmark"
+ version = "0.13.0"
+@@ -2442,6 +2562,12 @@ version = "5.3.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "69cdb34c158ceb288df11e18b4bd39de994f6657d83847bdffdbd7f346754b0f"
+ 
++[[package]]
++name = "radium"
++version = "0.7.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "dc33ff2d4973d518d823d61aa239014831e521c75da58e3df4840d3f47749d09"
++
+ [[package]]
+ name = "rand"
+ version = "0.7.3"
+@@ -2586,6 +2712,15 @@ version = "0.8.6"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "caf4aa5b0f434c91fe5c7f1ecb6a5ece2130b02ad2a590589dda5146df959001"
+ 
++[[package]]
++name = "rend"
++version = "0.4.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "71fe3824f5629716b1589be05dacd749f6aa084c87e00e016714a8cdfccc997c"
++dependencies = [
++ "bytecheck",
++]
++
+ [[package]]
+ name = "ring"
+ version = "0.17.14"
+@@ -2600,6 +2735,35 @@ dependencies = [
+  "windows-sys 0.52.0",
+ ]
+ 
++[[package]]
++name = "rkyv"
++version = "0.7.45"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "9008cd6385b9e161d8229e1f6549dd23c3d022f132a2ea37ac3a10ac4935779b"
++dependencies = [
++ "bitvec",
++ "bytecheck",
++ "bytes",
++ "hashbrown 0.12.3",
++ "ptr_meta",
++ "rend",
++ "rkyv_derive",
++ "seahash",
++ "tinyvec",
++ "uuid",
++]
++
++[[package]]
++name = "rkyv_derive"
++version = "0.7.45"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "503d1d27590a2b0a3a4ca4c94755aa2875657196ecbf401a42eff41d7de532c0"
++dependencies = [
++ "proc-macro2",
++ "quote",
++ "syn 1.0.109",
++]
++
+ [[package]]
+ name = "rsa"
+ version = "0.9.8"
+@@ -2620,6 +2784,22 @@ dependencies = [
+  "zeroize",
+ ]
+ 
++[[package]]
++name = "rust_decimal"
++version = "1.37.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "b203a6425500a03e0919c42d3c47caca51e79f1132046626d2c8871c5092035d"
++dependencies = [
++ "arrayvec",
++ "borsh 1.5.7",
++ "bytes",
++ "num-traits",
++ "rand 0.8.5",
++ "rkyv",
++ "serde",
++ "serde_json",
++]
++
+ [[package]]
+ name = "rustc-demangle"
+ version = "0.1.26"
+@@ -2645,40 +2825,36 @@ dependencies = [
+  "errno",
+  "libc",
+  "linux-raw-sys",
+- "windows-sys 0.59.0",
++ "windows-sys 0.60.2",
+ ]
+ 
+ [[package]]
+ name = "rustls"
+-version = "0.23.31"
++version = "0.21.12"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "c0ebcbd2f03de0fc1122ad9bb24b127a5a6cd51d72604a3f3c50ac459762b6cc"
++checksum = "3f56a14d1f48b391359b22f731fd4bd7e43c97f3c50eee276f3aa09c94784d3e"
+ dependencies = [
+- "once_cell",
+  "ring",
+- "rustls-pki-types",
+  "rustls-webpki",
+- "subtle",
+- "zeroize",
++ "sct",
+ ]
+ 
+ [[package]]
+-name = "rustls-pki-types"
+-version = "1.12.0"
++name = "rustls-pemfile"
++version = "1.0.4"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "229a4a4c221013e7e1f1a043678c5cc39fe5171437c88fb47151a21e6f5b5c79"
++checksum = "1c74cae0a4cf6ccbbf5f359f08efdf8ee7e1dc532573bf0db71968cb56b1448c"
+ dependencies = [
+- "zeroize",
++ "base64 0.21.7",
+ ]
+ 
+ [[package]]
+ name = "rustls-webpki"
+-version = "0.103.4"
++version = "0.101.7"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "0a17884ae0c1b773f1ccd2bd4a8c72f16da897310a98b0e84bf349ad5ead92fc"
++checksum = "8b6275d1ee7a1cd780b64aca7726599a1dbc893b1e64144529e55c3c2f745765"
+ dependencies = [
+  "ring",
+- "rustls-pki-types",
+  "untrusted",
+ ]
+ 
+@@ -2700,6 +2876,22 @@ version = "1.2.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
+ 
++[[package]]
++name = "sct"
++version = "0.7.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "da046153aa2352493d6cb7da4b6e5c0c057d8a1d0a9aa8560baffdd945acd414"
++dependencies = [
++ "ring",
++ "untrusted",
++]
++
++[[package]]
++name = "seahash"
++version = "4.1.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "1c107b6f4780854c8b126e228ea8869f4d7b71260f962fefb57b996b8959ba6b"
++
+ [[package]]
+ name = "semver"
+ version = "1.0.26"
+@@ -2844,6 +3036,12 @@ dependencies = [
+  "rand_core 0.6.4",
+ ]
+ 
++[[package]]
++name = "simdutf8"
++version = "0.1.5"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "e3a9fe34e3e7a50316060351f37187a3f546bce95496156754b601a5fa71b76e"
++
+ [[package]]
+ name = "slab"
+ version = "0.4.11"
+@@ -2855,9 +3053,6 @@ name = "smallvec"
+ version = "1.15.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
+-dependencies = [
+- "serde",
+-]
+ 
+ [[package]]
+ name = "socket2"
+@@ -2906,7 +3101,7 @@ dependencies = [
+  "Inflector",
+  "base64 0.22.1",
+  "bincode",
+- "bs58",
++ "bs58 0.5.1",
+  "bv",
+  "serde",
+  "serde_derive",
+@@ -2947,7 +3142,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "59f2101f4cc33e3fbfc8d1d23ea35d8532d6f1fa6a7c7081742e886f98f33126"
+ dependencies = [
+  "base64 0.22.1",
+- "bs58",
++ "bs58 0.5.1",
+  "serde",
+  "serde_derive",
+  "serde_json",
+@@ -3403,7 +3598,7 @@ dependencies = [
+  "blake3",
+  "borsh 0.10.4",
+  "borsh 1.5.7",
+- "bs58",
++ "bs58 0.5.1",
+  "bytemuck",
+  "console_error_panic_hook",
+  "console_log",
+@@ -3595,7 +3790,7 @@ version = "2.2.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "86280da8b99d03560f6ab5aca9de2e38805681df34e0bb8f238e69b29433b9df"
+ dependencies = [
+- "bs58",
++ "bs58 0.5.1",
+  "proc-macro2",
+  "quote",
+  "syn 2.0.106",
+@@ -3890,7 +4085,7 @@ dependencies = [
+  "base64 0.22.1",
+  "bincode",
+  "borsh 1.5.7",
+- "bs58",
++ "bs58 0.5.1",
+  "log",
+  "serde",
+  "serde_derive",
+@@ -3931,7 +4126,7 @@ checksum = "9e91068d54435121280c4a2f1c280d8d18381e3ccf54057c4530f40f26c2be1c"
+ dependencies = [
+  "base64 0.22.1",
+  "bincode",
+- "bs58",
++ "bs58 0.5.1",
+  "serde",
+  "serde_derive",
+  "serde_json",
+@@ -4401,11 +4596,21 @@ dependencies = [
+  "thiserror 2.0.16",
+ ]
+ 
++[[package]]
++name = "sqlformat"
++version = "0.2.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "7bba3a93db0cc4f7bdece8bb09e77e2e785c20bfebf79eb8340ed80708048790"
++dependencies = [
++ "nom",
++ "unicode_categories",
++]
++
+ [[package]]
+ name = "sqlx"
+-version = "0.8.6"
++version = "0.7.4"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "1fefb893899429669dcdd979aff487bd78f4064e5e7907e4269081e0ef7d97dc"
++checksum = "c9a2ccff1a000a5a59cd33da541d9f2fdcd9e6e8229cc200565942bff36d0aaa"
+ dependencies = [
+  "sqlx-core",
+  "sqlx-macros",
+@@ -4416,64 +4621,71 @@ dependencies = [
+ 
+ [[package]]
+ name = "sqlx-core"
+-version = "0.8.6"
++version = "0.7.4"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "ee6798b1838b6a0f69c007c133b8df5866302197e404e8b6ee8ed3e3a5e68dc6"
++checksum = "24ba59a9342a3d9bab6c56c118be528b27c9b60e490080e9711a04dccac83ef6"
+ dependencies = [
+- "base64 0.22.1",
++ "ahash 0.8.12",
++ "atoi",
++ "bigdecimal",
++ "byteorder",
+  "bytes",
+  "chrono",
+  "crc",
+  "crossbeam-queue",
+  "either",
+  "event-listener",
++ "futures-channel",
+  "futures-core",
+  "futures-intrusive",
+  "futures-io",
+  "futures-util",
+- "hashbrown 0.15.5",
+  "hashlink",
++ "hex",
+  "indexmap",
+  "log",
+  "memchr",
+  "once_cell",
++ "paste",
+  "percent-encoding",
+  "rustls",
++ "rustls-pemfile",
+  "serde",
+  "serde_json",
+  "sha2 0.10.9",
+  "smallvec",
+- "thiserror 2.0.16",
++ "sqlformat",
++ "thiserror 1.0.69",
+  "tokio",
+  "tokio-stream",
+  "tracing",
+  "url",
+  "uuid",
+- "webpki-roots 0.26.11",
++ "webpki-roots",
+ ]
+ 
+ [[package]]
+ name = "sqlx-macros"
+-version = "0.8.6"
++version = "0.7.4"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "a2d452988ccaacfbf5e0bdbc348fb91d7c8af5bee192173ac3636b5fb6e6715d"
++checksum = "4ea40e2345eb2faa9e1e5e326db8c34711317d2b5e08d0d5741619048a803127"
+ dependencies = [
+  "proc-macro2",
+  "quote",
+  "sqlx-core",
+  "sqlx-macros-core",
+- "syn 2.0.106",
++ "syn 1.0.109",
+ ]
+ 
+ [[package]]
+ name = "sqlx-macros-core"
+-version = "0.8.6"
++version = "0.7.4"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "19a9c1841124ac5a61741f96e1d9e2ec77424bf323962dd894bdb93f37d5219b"
++checksum = "5833ef53aaa16d860e92123292f1f6a3d53c34ba8b1969f152ef1a7bb803f3c8"
+ dependencies = [
+  "dotenvy",
+  "either",
+- "heck",
++ "heck 0.4.1",
+  "hex",
+  "once_cell",
+  "proc-macro2",
+@@ -4485,19 +4697,21 @@ dependencies = [
+  "sqlx-mysql",
+  "sqlx-postgres",
+  "sqlx-sqlite",
+- "syn 2.0.106",
++ "syn 1.0.109",
++ "tempfile",
+  "tokio",
+  "url",
+ ]
+ 
+ [[package]]
+ name = "sqlx-mysql"
+-version = "0.8.6"
++version = "0.7.4"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "aa003f0038df784eb8fecbbac13affe3da23b45194bd57dba231c8f48199c526"
++checksum = "1ed31390216d20e538e447a7a9b959e06ed9fc51c37b514b46eb758016ecd418"
+ dependencies = [
+  "atoi",
+- "base64 0.22.1",
++ "base64 0.21.7",
++ "bigdecimal",
+  "bitflags",
+  "byteorder",
+  "bytes",
+@@ -4528,7 +4742,7 @@ dependencies = [
+  "smallvec",
+  "sqlx-core",
+  "stringprep",
+- "thiserror 2.0.16",
++ "thiserror 1.0.69",
+  "tracing",
+  "uuid",
+  "whoami",
+@@ -4536,12 +4750,13 @@ dependencies = [
+ 
+ [[package]]
+ name = "sqlx-postgres"
+-version = "0.8.6"
++version = "0.7.4"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "db58fcd5a53cf07c184b154801ff91347e4c30d17a3562a635ff028ad5deda46"
++checksum = "7c824eb80b894f926f89a0b9da0c7f435d27cdd35b8c655b114e58223918577e"
+ dependencies = [
+  "atoi",
+- "base64 0.22.1",
++ "base64 0.21.7",
++ "bigdecimal",
+  "bitflags",
+  "byteorder",
+  "chrono",
+@@ -4550,6 +4765,7 @@ dependencies = [
+  "etcetera",
+  "futures-channel",
+  "futures-core",
++ "futures-io",
+  "futures-util",
+  "hex",
+  "hkdf",
+@@ -4559,6 +4775,7 @@ dependencies = [
+  "log",
+  "md-5",
+  "memchr",
++ "num-bigint",
+  "once_cell",
+  "rand 0.8.5",
+  "serde",
+@@ -4567,7 +4784,7 @@ dependencies = [
+  "smallvec",
+  "sqlx-core",
+  "stringprep",
+- "thiserror 2.0.16",
++ "thiserror 1.0.69",
+  "tracing",
+  "uuid",
+  "whoami",
+@@ -4575,9 +4792,9 @@ dependencies = [
+ 
+ [[package]]
+ name = "sqlx-sqlite"
+-version = "0.8.6"
++version = "0.7.4"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "c2d12fe70b2c1b4401038055f90f151b78208de1f9f89a7dbfd41587a10c3eea"
++checksum = "b244ef0a8414da0bed4bb1910426e890b19e5e9bccc27ada6b797d05c55ae0aa"
+ dependencies = [
+  "atoi",
+  "chrono",
+@@ -4591,11 +4808,10 @@ dependencies = [
+  "log",
+  "percent-encoding",
+  "serde",
+- "serde_urlencoded",
+  "sqlx-core",
+- "thiserror 2.0.16",
+  "tracing",
+  "url",
++ "urlencoding",
+  "uuid",
+ ]
+ 
+@@ -4611,6 +4827,9 @@ version = "0.1.0"
+ dependencies = [
+  "bcrypt",
+  "chrono",
++ "rust_decimal",
++ "serde",
++ "serde_json",
+  "sqlx",
+  "tokio",
+  "uuid",
+@@ -4672,6 +4891,12 @@ dependencies = [
+  "syn 2.0.106",
+ ]
+ 
++[[package]]
++name = "tap"
++version = "1.0.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
++
+ [[package]]
+ name = "tempfile"
+ version = "3.21.0"
+@@ -4682,7 +4907,7 @@ dependencies = [
+  "getrandom 0.3.3",
+  "once_cell",
+  "rustix",
+- "windows-sys 0.59.0",
++ "windows-sys 0.60.2",
+ ]
+ 
+ [[package]]
+@@ -5039,12 +5264,24 @@ version = "0.1.3"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "e70f2a8b45122e719eb623c01822704c4e0907e7e426a05927e1a1cfff5b75d0"
+ 
++[[package]]
++name = "unicode-segmentation"
++version = "1.12.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "f6ccf251212114b54433ec949fd6a7841275f9ada20dddd2f29e9ceea4501493"
++
+ [[package]]
+ name = "unicode-xid"
+ version = "0.2.6"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "ebc1c04c71510c7f702b52b7c350734c9ff1295c464a03335b00bb84fc54f853"
+ 
++[[package]]
++name = "unicode_categories"
++version = "0.1.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "39ec24b3121d976906ece63c9daad25b85969647682eee313cb5779fdd69e14e"
++
+ [[package]]
+ name = "universal-hash"
+ version = "0.5.1"
+@@ -5083,6 +5320,12 @@ dependencies = [
+  "serde",
+ ]
+ 
++[[package]]
++name = "urlencoding"
++version = "2.1.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "daf8dba3b7eb870caf1ddeed7bc9d2a049f3cfdfae7cb521b087cc33ae4c49da"
++
+ [[package]]
+ name = "utf8_iter"
+ version = "1.0.4"
+@@ -5097,6 +5340,7 @@ checksum = "2f87b8aa10b915a06587d0dec516c282ff295b475d94abf425d62b57710070a2"
+ dependencies = [
+  "getrandom 0.3.3",
+  "js-sys",
++ "serde",
+  "wasm-bindgen",
+ ]
+ 
+@@ -5218,21 +5462,9 @@ dependencies = [
+ 
+ [[package]]
+ name = "webpki-roots"
+-version = "0.26.11"
+-source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "521bc38abb08001b01866da9f51eb7c5d647a19260e00054a8c7fd5f9e57f7a9"
+-dependencies = [
+- "webpki-roots 1.0.2",
+-]
+-
+-[[package]]
+-name = "webpki-roots"
+-version = "1.0.2"
++version = "0.25.4"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "7e8983c3ab33d6fb807cfcdad2491c4ea8cbc8ed839181c7dfd9c67c83e261b2"
+-dependencies = [
+- "rustls-pki-types",
+-]
++checksum = "5f20c57d8d7db6d3b86154206ae5d8fba62dd39573114de97c2cb0578251f8e1"
+ 
+ [[package]]
+ name = "whoami"
+@@ -5330,6 +5562,15 @@ dependencies = [
+  "windows-targets 0.52.6",
+ ]
+ 
++[[package]]
++name = "windows-sys"
++version = "0.60.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "f2f500e4d28234f72040990ec9d39e3a6b950f9f22d3dba18416c35882612bcb"
++dependencies = [
++ "windows-targets 0.53.3",
++]
++
+ [[package]]
+ name = "windows-targets"
+ version = "0.48.5"
+@@ -5354,13 +5595,30 @@ dependencies = [
+  "windows_aarch64_gnullvm 0.52.6",
+  "windows_aarch64_msvc 0.52.6",
+  "windows_i686_gnu 0.52.6",
+- "windows_i686_gnullvm",
++ "windows_i686_gnullvm 0.52.6",
+  "windows_i686_msvc 0.52.6",
+  "windows_x86_64_gnu 0.52.6",
+  "windows_x86_64_gnullvm 0.52.6",
+  "windows_x86_64_msvc 0.52.6",
+ ]
+ 
++[[package]]
++name = "windows-targets"
++version = "0.53.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "d5fe6031c4041849d7c496a8ded650796e7b6ecc19df1a431c1a363342e5dc91"
++dependencies = [
++ "windows-link",
++ "windows_aarch64_gnullvm 0.53.0",
++ "windows_aarch64_msvc 0.53.0",
++ "windows_i686_gnu 0.53.0",
++ "windows_i686_gnullvm 0.53.0",
++ "windows_i686_msvc 0.53.0",
++ "windows_x86_64_gnu 0.53.0",
++ "windows_x86_64_gnullvm 0.53.0",
++ "windows_x86_64_msvc 0.53.0",
++]
++
+ [[package]]
+ name = "windows_aarch64_gnullvm"
+ version = "0.48.5"
+@@ -5373,6 +5631,12 @@ version = "0.52.6"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "32a4622180e7a0ec044bb555404c800bc9fd9ec262ec147edd5989ccd0c02cd3"
+ 
++[[package]]
++name = "windows_aarch64_gnullvm"
++version = "0.53.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "86b8d5f90ddd19cb4a147a5fa63ca848db3df085e25fee3cc10b39b6eebae764"
++
+ [[package]]
+ name = "windows_aarch64_msvc"
+ version = "0.48.5"
+@@ -5385,6 +5649,12 @@ version = "0.52.6"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "09ec2a7bb152e2252b53fa7803150007879548bc709c039df7627cabbd05d469"
+ 
++[[package]]
++name = "windows_aarch64_msvc"
++version = "0.53.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "c7651a1f62a11b8cbd5e0d42526e55f2c99886c77e007179efff86c2b137e66c"
++
+ [[package]]
+ name = "windows_i686_gnu"
+ version = "0.48.5"
+@@ -5397,12 +5667,24 @@ version = "0.52.6"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "8e9b5ad5ab802e97eb8e295ac6720e509ee4c243f69d781394014ebfe8bbfa0b"
+ 
++[[package]]
++name = "windows_i686_gnu"
++version = "0.53.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "c1dc67659d35f387f5f6c479dc4e28f1d4bb90ddd1a5d3da2e5d97b42d6272c3"
++
+ [[package]]
+ name = "windows_i686_gnullvm"
+ version = "0.52.6"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "0eee52d38c090b3caa76c563b86c3a4bd71ef1a819287c19d586d7334ae8ed66"
+ 
++[[package]]
++name = "windows_i686_gnullvm"
++version = "0.53.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "9ce6ccbdedbf6d6354471319e781c0dfef054c81fbc7cf83f338a4296c0cae11"
++
+ [[package]]
+ name = "windows_i686_msvc"
+ version = "0.48.5"
+@@ -5415,6 +5697,12 @@ version = "0.52.6"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "240948bc05c5e7c6dabba28bf89d89ffce3e303022809e73deaefe4f6ec56c66"
+ 
++[[package]]
++name = "windows_i686_msvc"
++version = "0.53.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "581fee95406bb13382d2f65cd4a908ca7b1e4c2f1917f143ba16efe98a589b5d"
++
+ [[package]]
+ name = "windows_x86_64_gnu"
+ version = "0.48.5"
+@@ -5427,6 +5715,12 @@ version = "0.52.6"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "147a5c80aabfbf0c7d901cb5895d1de30ef2907eb21fbbab29ca94c5b08b1a78"
+ 
++[[package]]
++name = "windows_x86_64_gnu"
++version = "0.53.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "2e55b5ac9ea33f2fc1716d1742db15574fd6fc8dadc51caab1c16a3d3b4190ba"
++
+ [[package]]
+ name = "windows_x86_64_gnullvm"
+ version = "0.48.5"
+@@ -5439,6 +5733,12 @@ version = "0.52.6"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "24d5b23dc417412679681396f2b49f3de8c1473deb516bd34410872eff51ed0d"
+ 
++[[package]]
++name = "windows_x86_64_gnullvm"
++version = "0.53.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "0a6e035dd0599267ce1ee132e51c27dd29437f63325753051e71dd9e42406c57"
++
+ [[package]]
+ name = "windows_x86_64_msvc"
+ version = "0.48.5"
+@@ -5451,6 +5751,12 @@ version = "0.52.6"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec"
+ 
++[[package]]
++name = "windows_x86_64_msvc"
++version = "0.53.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "271414315aff87387382ec3d271b52d7ae78726f5d44ac98b4f4030c91880486"
++
+ [[package]]
+ name = "winnow"
+ version = "0.7.13"
+@@ -5472,6 +5778,15 @@ version = "0.6.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "ea2f10b9bb0928dfb1b42b65e1f9e36f7f54dbdf08457afefb38afcdec4fa2bb"
+ 
++[[package]]
++name = "wyz"
++version = "0.5.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "05f360fc0b24296329c78fda852a1e9ae82de9cf7b27dae4b7f62f118f77b9ed"
++dependencies = [
++ "tap",
++]
++
+ [[package]]
+ name = "yellowstone-grpc-proto"
+ version = "9.0.0"
+diff --git a/backend/Cargo.toml b/backend/Cargo.toml
+index 3219603..c197d61 100644
+--- a/backend/Cargo.toml
++++ b/backend/Cargo.toml
+@@ -4,7 +4,16 @@ version = "0.1.0"
+ edition = "2024"
+ 
+ [dependencies]
+-actix-web = "4.11.0"
+-tokio = "1.47.1"
+-serde = { version = "1.0", features = ["derive"] }
+-serde_json = "1.0"
++# actix-web = "4.11.0"
++# tokio = "1.47.1"
++# serde = { version = "1.0", features = ["derive"] }
++# serde_json = "1.0"
++
++actix-web = "4"
++serde = { version = "1", features = ["derive"] }
++serde_json = "1"
++reqwest = { version = "0.11", features = ["json"] }
++tokio = { version = "1", features = ["full"] }
++solana-client = "2.0"
++solana-sdk = "2.0"
++store = { path = "../store" }
+\ No newline at end of file
+diff --git a/backend/src/main.rs b/backend/src/main.rs
+index a6f5f26..67d573d 100644
+--- a/backend/src/main.rs
++++ b/backend/src/main.rs
+@@ -1,13 +1,27 @@
+-use actix_web::{App, HttpServer};
++use actix_web::{App, HttpServer, web};
++use dotenvy::dotenv;
++use std::env;
+ 
+ mod routes;
++use store::Store;
++
+ use routes::*;
+ 
+ #[actix_web::main]
+ async fn main() -> std::io::Result<()> {
++    dotenv().ok();
++
++    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set in .env");
++
++    let store = Store::new(&database_url)
++        .await
++        .expect("Failed to connect to database");
++
++    store.migrate().await.expect("Failed to run migrations");
++
+     HttpServer::new(|| {
+         App::new()
+-            .service(sign_up)  
++            .service(sign_up)
+             .service(sign_in)
+             .service(get_user)
+             .service(quote)
+diff --git a/backend/src/routes/mod.rs b/backend/src/routes/mod.rs
+index 810f7d4..03d0366 100644
+--- a/backend/src/routes/mod.rs
++++ b/backend/src/routes/mod.rs
+@@ -1,5 +1,5 @@
+-pub mod user;
+ pub mod solana;
++pub mod user;
+ 
+-pub use user::*;
+ pub use solana::*;
++pub use user::*;
+diff --git a/backend/src/routes/solana.rs b/backend/src/routes/solana.rs
+index cee520e..e10aad0 100644
+--- a/backend/src/routes/solana.rs
++++ b/backend/src/routes/solana.rs
+@@ -1,61 +1,140 @@
+-use actix_web::{web, HttpResponse, Result};
++use actix_web::{HttpResponse, Result, web};
++use reqwest::Client;
+ use serde::{Deserialize, Serialize};
++use solana_sdk::{
++    pubkey::Pubkey,
++    signature::{Keypair, Signer},
++    system_instruction,
++    transaction::Transaction,
++};
++
++const RPC_URL: &str = "https://api.mainnet-beta.solana.com";
++const JUP_QUOTE_API: &str = "https://quote-api.jup.ag/v6/quote";
++const JUP_SWAP_API: &str = "https://quote-api.jup.ag/v6/swap";
+ 
+ #[derive(Deserialize)]
+ pub struct QuoteRequest {
++    pub input_mint: String,
++    pub output_mint: String,
++    pub amount: u64,
+ }
+ 
+ #[derive(Serialize, Deserialize)]
+ pub struct QuoteResponse {
++    pub in_amount: String,
++    pub out_amount: String,
++    pub other_amount_threshold: String,
++    pub swap_mode: String,
++    pub slippage_bps: u64,
+ }
+ 
+-
+ #[derive(Deserialize)]
+ pub struct SwapRequest {
++    pub input_mint: String,
++    pub output_mint: String,
++    pub amount: u64,
++    pub user_pubkey: String,
+ }
+ 
+ #[derive(Serialize)]
+ pub struct SwapResponse {
++    pub txid: String,
+ }
+ 
+ #[derive(Serialize)]
+ pub struct BalanceResponse {
++    pub balance: u64,
+ }
+ 
+ #[derive(Serialize)]
+ pub struct TokenBalanceResponse {
++    pub balance: u64,
+ }
+ 
+ #[actix_web::post("/quote")]
+ pub async fn quote(req: web::Json<QuoteRequest>) -> Result<HttpResponse> {
+-    let response = QuoteResponse {};
+-    
+-    Ok(HttpResponse::Ok().json(response))
++    let client = Client::new();
++    let url = format!(
++        "{}?inputMint={}&outputMint={}&amount={}&slippageBps=50",
++        JUP_QUOTE_API, req.input_mint, req.output_mint, req.amount
++    );
++
++    let res = client
++        .get(&url)
++        .send()
++        .await
++        .unwrap()
++        .json::<serde_json::Value>()
++        .await
++        .unwrap();
++    Ok(HttpResponse::Ok().json(res))
+ }
+ 
+ #[actix_web::post("/swap")]
+ pub async fn swap(req: web::Json<SwapRequest>) -> Result<HttpResponse> {
+-    
+-    let response = SwapResponse {};
+-    
+-    Ok(HttpResponse::Ok().json(response))
++    let client = Client::new();
++
++    // Step 1: Fetch best route from Jupiter
++    let quote_url = format!(
++        "{}?inputMint={}&outputMint={}&amount={}&slippageBps=50",
++        JUP_QUOTE_API, req.input_mint, req.output_mint, req.amount
++    );
++    let quote_res = client
++        .get(&quote_url)
++        .send()
++        .await
++        .unwrap()
++        .json::<serde_json::Value>()
++        .await
++        .unwrap();
++
++    // Step 2: Ask Jupiter to build the transaction
++    let swap_tx = client
++        .post(JUP_SWAP_API)
++        .json(&serde_json::json!({
++            "userPublicKey": req.user_pubkey,
++            "quoteResponse": quote_res,
++            "wrapAndUnwrapSol": true
++        }))
++        .send()
++        .await
++        .unwrap()
++        .json::<serde_json::Value>()
++        .await
++        .unwrap();
++
++    Ok(HttpResponse::Ok().json(swap_tx))
+ }
+ 
+ #[actix_web::get("/sol-balance/{pubkey}")]
+ pub async fn sol_balance() -> Result<HttpResponse> {
+-    
+-    let response = BalanceResponse {
+-    };
+-    
+-    Ok(HttpResponse::Ok().json(response))
++    let client = RpcClient::new(RPC_URL.to_string());
++    let pubkey = Pubkey::from_str(&path.into_inner()).unwrap();
++    let balance = client.get_balance(&pubkey).unwrap();
++    Ok(HttpResponse::Ok().json(BalanceResponse { balance }))
+ }
+ 
+ #[actix_web::get("/token-balance/{pubkey}/{mint}")]
+-pub async fn token_balance() -> Result<HttpResponse> {    
+-    
+-    let response = TokenBalanceResponse {
+-        
++pub async fn token_balance() -> Result<HttpResponse> {
++    let client = RpcClient::new(RPC_URL.to_string());
++    let (pubkey_str, mint_str) = path.into_inner();
++    let pubkey = Pubkey::from_str(&pubkey_str).unwrap();
++    let mint = Pubkey::from_str(&mint_str).unwrap();
++
++    let balances = client
++        .get_token_accounts_by_owner(
++            &pubkey,
++            solana_client::rpc_client::TokenAccountsFilter::Mint(mint),
++        )
++        .unwrap();
++
++    let balance = if let Some(account) = balances.value.first() {
++        let data = &account.account.data;
++        // decode SPL Token account data here...
++        0u64
++    } else {
++        0u64
+     };
+-    
+-    Ok(HttpResponse::Ok().json(response))
++
++    Ok(HttpResponse::Ok().json(TokenBalanceResponse { balance }))
+ }
+diff --git a/backend/src/routes/user.rs b/backend/src/routes/user.rs
+index 744f978..aa2a293 100644
+--- a/backend/src/routes/user.rs
++++ b/backend/src/routes/user.rs
+@@ -1,4 +1,4 @@
+-use actix_web::{web, HttpResponse, Result};
++use actix_web::{HttpResponse, Result, web};
+ use serde::{Deserialize, Serialize};
+ 
+ #[derive(Deserialize)]
+@@ -15,6 +15,9 @@ pub struct SignInRequest {
+ 
+ #[derive(Serialize)]
+ pub struct UserResponse {
++    pub id: Uuid,
++    pub email: String,
++    pub created_at: chrono::DateTime<Utc>,
+ }
+ 
+ #[derive(Serialize)]
+@@ -29,29 +32,57 @@ pub struct SignupResponse {
+ 
+ #[actix_web::post("/signup")]
+ pub async fn sign_up(req: web::Json<SignUpRequest>) -> Result<HttpResponse> {
+-    let response = SignupResponse {
+-        message: "User created successfully".to_string(),
+-    };
+-    
+-    Ok(HttpResponse::Created().json(response))
++    let password_hash = argon2::hash_encoded(
++        req.password.as_bytes(),
++        &Uuid::new_v4().as_bytes(),
++        &Config::default(),
++    )
++    .unwrap();
++
++    let user_id = store
++        .create_user(&req.email, &password_hash)
++        .await
++        .map_err(|_| actix_web::error::ErrorInternalServerError("DB insert failed"))?;
++
++    Ok(HttpResponse::Created().json(SignupResponse {
++        message: format!("User {} created successfully", req.email),
++    }))
+ }
+ 
+ #[actix_web::post("/signin")]
+ pub async fn sign_in(req: web::Json<SignInRequest>) -> Result<HttpResponse> {
+-    let response = AuthResponse {
+-        token: "temporary_token".to_string(),
+-    };
+-    
+-    Ok(HttpResponse::Ok().json(response))
++    if let Some(user) = store.find_user_by_email(&req.email).await.unwrap() {
++        if argon2::verify_encoded(&user.password_hash, req.password.as_bytes()).unwrap_or(false) {
++            let claims = Claims {
++                sub: user.id.to_string(),
++                exp: (Utc::now().timestamp() + 3600) as usize,
++            };
++            let token = encode(
++                &Header::default(),
++                &claims,
++                &EncodingKey::from_secret("secret".as_ref()),
++            )
++            .unwrap();
++
++            return Ok(HttpResponse::Ok().json(AuthResponse { token }));
++        }
++    }
++
++    Err(actix_web::error::ErrorUnauthorized("Invalid credentials"))
+ }
+ 
+ #[actix_web::get("/user/{id}")]
+ pub async fn get_user(path: web::Path<u32>) -> Result<HttpResponse> {
+     let user_id = path.into_inner();
+-    
+-    let user = UserResponse {
+-       
+-    };
+-    
+-    Ok(HttpResponse::Ok().json(user))
++
++    if let Some(user) = store.find_user_by_id(user_id).await.unwrap() {
++        let response = UserResponse {
++            id: user.id,
++            email: user.email,
++            created_at: user.created_at,
++        };
++        Ok(HttpResponse::Ok().json(response))
++    } else {
++        Err(actix_web::error::ErrorNotFound("User not found"))
++    }
+ }
+diff --git a/indexer/Cargo.toml b/indexer/Cargo.toml
+index 48fa0ee..e6a0995 100644
+--- a/indexer/Cargo.toml
++++ b/indexer/Cargo.toml
+@@ -4,8 +4,26 @@ version = "0.1.0"
+ edition = "2024"
+ 
+ [dependencies]
++# tokio = { version = "1.0", features = ["full"] }
++# # tonic = "0.14.2"
++# bytes = "1.10.1"
++# futures = "0.3.31"
++# # yellowstone-grpc-proto = "9.0.0"
++# yellowstone-grpc-proto = "1.12"
++# yellowstone-grpc-client = "1.12"
++# tonic = { version = "0.10", features = ["tls", "tls-roots"] }
++# tonic-health = "0.10"
++
++yellowstone-grpc-proto = "1.12"
++yellowstone-grpc-client = "1.12"
++tonic = { version = "0.10", features = ["tls", "tls-roots"] }
++tonic-health = "0.10"
+ tokio = { version = "1.0", features = ["full"] }
+-tonic = "0.14.2"
+-bytes = "1.10.1"
+-futures = "0.3.31"
+-yellowstone-grpc-proto = "9.0.0"
++futures = "0.3"
++solana-sdk = "1.16"
++bs58 = "0.5"
++tracing = "0.1"
++tracing-subscriber = "0.3"
++serde = { version = "1.0", features = ["derive"] }
++thiserror = "1.0"
++bytes = "1.0"
+\ No newline at end of file
+diff --git a/indexer/src/main.rs b/indexer/src/main.rs
+index 74ef4c4..5abe55e 100644
+--- a/indexer/src/main.rs
++++ b/indexer/src/main.rs
+@@ -1,12 +1,243 @@
+-use yellowstone::GeyserGrpcClient;
++use futures::StreamExt;
++use solana_sdk::pubkey::Pubkey;
++use std::str::FromStr;
++use tokio::signal;
++use tracing::{error, info, warn};
++use yellowstone_grpc_proto::prelude::{
++    CommitmentLevel, SubscribeRequest, SubscribeRequestFilterAccounts,
++    SubscribeRequestFilterAccountsFilter, subscribe_update::UpdateOneof,
++};
+ pub mod yellowstone;
+ 
++#[derive(Debug, Clone)]
++pub struct AccountUpdate {
++    pub pubkey: String,
++    pub lamports: u64,
++    pub owner: String,
++    pub executable: bool,
++    pub rent_epoch: u64,
++    pub data: Vec<u8>,
++    pub write_version: u64,
++    pub slot: u64,
++}
++
++pub struct AccountIndexer {
++    client: GeyserGrpcClient<impl tonic::service::Interceptor>,
++    accounts: HashMap<String, AccountUpdate>,
++}
++
++impl AccountIndexer {
++    pub async fn new(
++        endpoint: &str,
++        token: Option<&str>,
++    ) -> Result<Self, Box<dyn std::error::Error>> {
++        let mut builder = GeyserGrpcClient::build_from_shared(endpoint)?;
++
++        if let Some(token) = token {
++            builder = builder.x_token(Some(token))?;
++        }
++
++        let client = builder.connect().await?;
++
++        Ok(Self {
++            client,
++            accounts: HashMap::new(),
++        })
++    }
++
++    pub async fn index_accounts(
++        &mut self,
++        account_filters: Vec<AccountFilter>,
++    ) -> Result<(), Box<dyn std::error::Error>> {
++        info!(
++            "Starting account indexing with {} filters",
++            account_filters.len()
++        );
++
++        // Create subscription request
++        let mut accounts_filter = HashMap::new();
++
++        for (index, filter) in account_filters.iter().enumerate() {
++            let filter_key = format!("filter_{}", index);
++            let account_filter = match filter {
++                AccountFilter::Owner(owner) => SubscribeRequestFilterAccountsFilter {
++                    owner: vec![owner.to_string()],
++                    ..Default::default()
++                },
++                AccountFilter::Account(pubkey) => SubscribeRequestFilterAccountsFilter {
++                    account: vec![pubkey.to_string()],
++                    ..Default::default()
++                },
++                AccountFilter::ProgramData => SubscribeRequestFilterAccountsFilter {
++                    owner: vec!["BPFLoaderUpgradeab1e11111111111111111111111".to_string()],
++                    ..Default::default()
++                },
++                AccountFilter::TokenAccount => SubscribeRequestFilterAccountsFilter {
++                    owner: vec!["TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA".to_string()],
++                    ..Default::default()
++                },
++            };
++
++            accounts_filter.insert(
++                filter_key,
++                SubscribeRequestFilterAccounts {
++                    account: vec![account_filter],
++                },
++            );
++        }
++
++        let request = SubscribeRequest {
++            accounts: accounts_filter,
++            slots: HashMap::new(),
++            transactions: HashMap::new(),
++            transactions_status: HashMap::new(),
++            blocks: HashMap::new(),
++            blocks_meta: HashMap::new(),
++            entry: HashMap::new(),
++            commitment: Some(CommitmentLevel::Confirmed as i32),
++            accounts_data_slice: vec![],
++            ping: None,
++        };
++
++        info!("Subscribing to account updates...");
++        let mut stream = self.client.subscribe_once(request).await?;
++
++        // Handle updates
++        while let Some(update) = stream.next().await {
++            match update {
++                Ok(msg) => {
++                    if let Some(update_oneof) = msg.update_oneof {
++                        self.handle_update(update_oneof).await;
++                    }
++                }
++                Err(status) => {
++                    error!("Stream error: {}", status);
++                    break;
++                }
++            }
++        }
++
++        Ok(())
++    }
++
++    async fn handle_update(&mut self, update: UpdateOneof) {
++        match update {
++            UpdateOneof::Account(account_update) => {
++                if let Some(account) = account_update.account {
++                    let pubkey = bs58::encode(&account.pubkey).into_string();
++
++                    let account_data = AccountUpdate {
++                        pubkey: pubkey.clone(),
++                        lamports: account.lamports,
++                        owner: bs58::encode(&account.owner).into_string(),
++                        executable: account.executable,
++                        rent_epoch: account.rent_epoch,
++                        data: account.data,
++                        write_version: account.write_version,
++                        slot: account_update.slot,
++                    };
++
++                    info!(
++                        "Account update: {} (owner: {}, lamports: {})",
++                        pubkey, account_data.owner, account_data.lamports
++                    );
++
++                    self.accounts.insert(pubkey, account_data);
++                }
++            }
++            UpdateOneof::Slot(slot_update) => {
++                info!(
++                    "Slot update: {} (status: {:?})",
++                    slot_update.slot, slot_update.status
++                );
++            }
++            UpdateOneof::Transaction(tx_update) => {
++                if let Some(transaction) = tx_update.transaction {
++                    let signature = bs58::encode(&transaction.signature).into_string();
++                    info!(
++                        "Transaction update: {} (slot: {})",
++                        signature, tx_update.slot
++                    );
++                }
++            }
++            _ => {
++                // Handle other update types as needed
++            }
++        }
++    }
++
++    pub fn get_account(&self, pubkey: &str) -> Option<&AccountUpdate> {
++        self.accounts.get(pubkey)
++    }
++
++    pub fn get_accounts_by_owner(&self, owner: &str) -> Vec<&AccountUpdate> {
++        self.accounts
++            .values()
++            .filter(|account| account.owner == owner)
++            .collect()
++    }
++
++    pub fn account_count(&self) -> usize {
++        self.accounts.len()
++    }
++
++    pub async fn health_check(&mut self) -> Result<(), Box<dyn std::error::Error>> {
++        let health_response = self.client.health_check().await?;
++        info!("Health check: {:?}", health_response.status);
++        Ok(())
++    }
++}
++
++#[derive(Debug, Clone)]
++pub enum AccountFilter {
++    Owner(Pubkey),
++    Account(Pubkey),
++    ProgramData,
++    TokenAccount,
++}
++
+ #[tokio::main]
+-async fn main() {   
+-    let client = GeyserGrpcClient::new(HealthClient::new(), GeyserClient::new());
+-    client.health_check().await;
++async fn main() {
++    let endpoint = std::env::var("YELLOWSTONE_ENDPOINT")
++        .unwrap_or_else(|_| "https://api.mainnet-beta.solana.com:443".to_string());
++    let token = std::env::var("YELLOWSTONE_TOKEN").ok();
++
++    let mut indexer = AccountIndexer::new(&endpoint, token.as_deref()).await?;
+ 
+-    
++    // Health check
++    match indexer.health_check().await {
++        Ok(_) => info!("Connected to Yellowstone gRPC successfully"),
++        Err(e) => {
++            error!("Failed to connect: {}", e);
++            return Err(e);
++        }
++    }
+ 
++    let filters = vec![
++        // Index all token accounts
++        AccountFilter::TokenAccount,
++        // Index a specific account (replace with actual pubkey)
++        AccountFilter::Account(Pubkey::from_str("11111111111111111111111111111112")?),
++        // Index accounts owned by System Program
++        AccountFilter::Owner(Pubkey::from_str("11111111111111111111111111111111")?),
++        // Index program data accounts
++        AccountFilter::ProgramData,
++    ];
+ 
++    let shutdown = signal::ctrl_c();
++
++    tokio::select! {
++        result = indexer.index_accounts(filters) => {
++            if let Err(e) = result {
++                error!("Indexing error: {}", e);
++            }
++        }
++        _ = shutdown => {
++            info!("Received shutdown signal, stopping indexer...");
++            info!("Indexed {} accounts", indexer.account_count());
++        }
++    }
++
++    let client = GeyserGrpcClient::new(HealthClient::new(), GeyserClient::new());
++    client.health_check().await;
+ }
+diff --git a/indexer/src/yellowstone.rs b/indexer/src/yellowstone.rs
+index 7d5e6c4..72079d1 100644
+--- a/indexer/src/yellowstone.rs
++++ b/indexer/src/yellowstone.rs
+@@ -8,19 +8,19 @@ use {
+     },
+     std::time::Duration,
+     tonic::{
++        Request, Response, Status,
+         codec::{CompressionEncoding, Streaming},
+-        metadata::{errors::InvalidMetadataValue, AsciiMetadataValue, MetadataValue},
++        metadata::{AsciiMetadataValue, MetadataValue, errors::InvalidMetadataValue},
+         service::interceptor::InterceptedService,
+         transport::channel::{Channel, Endpoint},
+-        Request, Response, Status,
+     },
+-    tonic_health::pb::{health_client::HealthClient, HealthCheckRequest, HealthCheckResponse},
++    tonic_health::pb::{HealthCheckRequest, HealthCheckResponse, health_client::HealthClient},
+     yellowstone_grpc_proto::prelude::{
+-        geyser_client::GeyserClient, CommitmentLevel, GetBlockHeightRequest,
+-        GetBlockHeightResponse, GetLatestBlockhashRequest, GetLatestBlockhashResponse,
+-        GetSlotRequest, GetSlotResponse, GetVersionRequest, GetVersionResponse,
+-        IsBlockhashValidRequest, IsBlockhashValidResponse, PingRequest, PongResponse,
+-        SubscribeReplayInfoRequest, SubscribeReplayInfoResponse, SubscribeRequest, SubscribeUpdate,
++        CommitmentLevel, GetBlockHeightRequest, GetBlockHeightResponse, GetLatestBlockhashRequest,
++        GetLatestBlockhashResponse, GetSlotRequest, GetSlotResponse, GetVersionRequest,
++        GetVersionResponse, IsBlockhashValidRequest, IsBlockhashValidResponse, PingRequest,
++        PongResponse, SubscribeReplayInfoRequest, SubscribeReplayInfoResponse, SubscribeRequest,
++        SubscribeUpdate, geyser_client::GeyserClient,
+     },
+ };
+ 
+@@ -494,4 +494,4 @@ mod tests {
+                 .to_owned()
+         );
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/mpc/Cargo.toml b/mpc/Cargo.toml
+index 2e79951..1e609ac 100644
+--- a/mpc/Cargo.toml
++++ b/mpc/Cargo.toml
+@@ -5,4 +5,21 @@ edition = "2024"
+ 
+ [dependencies]
+ actix-web = "4.11.0"
+-tokio = "1.47.1"
++bs58 = "0.4"
++serde = { version = "1.0", features = ["derive"] }
++serde_json = "1.0"
++tokio = { version = "1", features = ["full"] }
++solana-sdk = "1.16"
++solana-client = "1.16"
++solana-program = "1.16"
++curv = "0.4"
++# multi-party-eddsa = "0.4"
++base64 = "0.21"
++rand = "0.8"
++spl-memo = "4.0"
++# ed25519-dalek = "1.0.1" 
++# rand07 = { package = "rand", version = "0.7" }
++multi-party-eddsa = { git = "https://github.com/ZenGo-X/multi-party-eddsa.git" }
++# curv = {package = "curv-kzen", version = "0.9" }
++# curve25519-dalek = "3.2.1"
++sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono","bigdecimal","decimal","migrate",] }
+\ No newline at end of file
+diff --git a/mpc/src/error.rs b/mpc/src/error.rs
+index e69de29..8b13789 100644
+--- a/mpc/src/error.rs
++++ b/mpc/src/error.rs
+@@ -0,0 +1 @@
++
+diff --git a/mpc/src/main.rs b/mpc/src/main.rs
+index f004c12..2e4283e 100644
+--- a/mpc/src/main.rs
++++ b/mpc/src/main.rs
+@@ -1,49 +1,356 @@
+-use actix_web::{web::{post}, App, Error, HttpResponse, HttpServer};
++use actix_web::{App, Error, HttpResponse, HttpServer, Result, web::post};
++use solana_client::rpc_client::RpcClient;
++use solana_sdk::{
++    hash::Hash,
++    pubkey::Pubkey,
++    signature::{Keypair, Signer},
++    system_instruction,
++    transaction::Transaction,
++};
++use std::str::FromStr;
+ 
+ pub mod error;
++pub mod native_token;
+ pub mod serialization;
+ pub mod tss;
+ 
++use crate::{
++    serialization::{AggMessage1, Error, PartialSignature, SecretAggStepOne},
++    tss::{key_agg, sign_and_broadcast, step_one, step_two},
++};
++
++#[derive(Deserialize)]
++struct GenerateRequest {
++    // No parameters needed for key generation
++}
++
++#[derive(Serialize)]
++struct GenerateResponse {
++    public_key: String,
++    private_key: String,
++}
++
++#[derive(Deserialize)]
++struct SendSingleRequest {
++    private_key: String,
++    to: String,
++    amount: f64,
++    memo: Option<String>,
++    rpc_url: Option<String>,
++}
++
++#[derive(Serialize)]
++struct SendSingleResponse {
++    transaction_signature: String,
++}
++
++#[derive(Deserialize)]
++struct AggregateKeysRequest {
++    public_keys: Vec<String>,
++    key_for_coefficient: Option<String>,
++}
++
++#[derive(Serialize)]
++struct AggregateKeysResponse {
++    aggregated_public_key: String,
++}
++
++#[derive(Deserialize)]
++struct AggSendStep1Request {
++    private_key: String,
++}
++
++#[derive(Serialize)]
++struct AggSendStep1Response {
++    message1: String,
++    secret_state: String,
++}
++
++#[derive(Deserialize)]
++struct AggSendStep2Request {
++    private_key: String,
++    amount: f64,
++    to: String,
++    memo: Option<String>,
++    recent_block_hash: String,
++    public_keys: Vec<String>,
++    first_messages: Vec<String>, // Base64 encoded AggMessage1s
++    secret_state: String,        // Base64 encoded SecretAggStepOne
++}
++
++#[derive(Serialize)]
++struct AggSendStep2Response {
++    partial_signature: String, // Base64 encoded PartialSignature
++}
++
++#[derive(Deserialize)]
++struct AggregateSigsBroadcastRequest {
++    amount: f64,
++    to: String,
++    memo: Option<String>,
++    recent_block_hash: String,
++    public_keys: Vec<String>,
++    partial_signatures: Vec<String>, // Base64 encoded PartialSignatures
++    rpc_url: Option<String>,
++}
++
++#[derive(Serialize)]
++struct AggregateSigsBroadcastResponse {
++    transaction_signature: String,
++}
++
+ #[actix_web::main]
+ async fn main() -> Result<(), std::io::Error> {
+     HttpServer::new(|| {
+         App::new()
+-        .route("/generate", post().to(generate))
+-        .route("/send-single", post().to(send_single))
+-        .route("/aggregate-keys", post().to(aggregate_keys))
+-        .route("/agg-send-step1", post().to(agg_send_step1))
+-        .route("/agg-send-step2", post().to(agg_send_step2))
+-        .route(
+-            "/aggregate-signatures-broadcast",
+-            post().to(aggregate_signatures_broadcast),
+-        )
++            .route("/generate", post().to(generate))
++            .route("/send-single", post().to(send_single))
++            .route("/aggregate-keys", post().to(aggregate_keys))
++            .route("/agg-send-step1", post().to(agg_send_step1))
++            .route("/agg-send-step2", post().to(agg_send_step2))
++            .route(
++                "/aggregate-signatures-broadcast",
++                post().to(aggregate_signatures_broadcast),
++            )
+     })
+-    
+-        .bind("127.0.0.1:8080")?
+-        .run()
+-        .await
++    .bind("127.0.0.1:8080")?
++    .run()
++    .await
+ }
+ 
+ async fn generate() -> Result<HttpResponse, Error> {
++    let mut rng = rand::thread_rng();
++    let keypair = Keypair::generate(&mut rng);
++    let response = GenerateResponse {
++        public_key: keypair.pubkey().to_string(),
++        private_key: bs58::encode(keypair.to_bytes()).into_string(),
++    };
+     Ok(HttpResponse::Ok().body("Hello, world!"))
+ }
+ 
+ async fn send_single() -> Result<HttpResponse, Error> {
++    let keypair_bytes = bs58::decode(&req.private_key)
++        .into_vec()
++        .map_err(|e| actix_web::error::ErrorBadRequest(format!("Invalid private key: {}", e)))?;
++
++    let keypair = Keypair::from_bytes(&keypair_bytes)
++        .map_err(|e| actix_web::error::ErrorBadRequest(format!("Invalid keypair: {}", e)))?;
++
++    let to_pubkey = Pubkey::from_str(&req.to).map_err(|e| {
++        actix_web::error::ErrorBadRequest(format!("Invalid destination address: {}", e))
++    })?;
++
++    let rpc_url = req
++        .rpc_url
++        .as_deref()
++        .unwrap_or("https://api.devnet.solana.com");
++    let client = RpcClient::new(rpc_url);
++
++    // Create transaction
++    let lamports = sol_to_lamports(req.amount);
++    let recent_blockhash = client.get_latest_blockhash().map_err(|e| {
++        actix_web::error::ErrorInternalServerError(format!("Failed to get recent blockhash: {}", e))
++    })?;
++
++    let mut transaction = Transaction::new_with_payer(
++        &[system_instruction::transfer(
++            &keypair.pubkey(),
++            &to_pubkey,
++            lamports,
++        )],
++        Some(&keypair.pubkey()),
++    );
++
++    transaction.sign(&[&keypair], recent_blockhash);
++
++    let signature = client
++        .send_and_confirm_transaction(&transaction)
++        .map_err(|e| {
++            actix_web::error::ErrorInternalServerError(format!("Failed to send transaction: {}", e))
++        })?;
++
++    let response = SendSingleResponse {
++        transaction_signature: signature.to_string(),
++    };
++
+     Ok(HttpResponse::Ok().body("Hello, world!"))
+ }
+ 
+ async fn aggregate_keys() -> Result<HttpResponse, Error> {
++    let public_keys: Result<Vec<Pubkey>, _> = req
++        .public_keys
++        .iter()
++        .map(|key_str| Pubkey::from_str(key_str))
++        .collect();
++
++    let public_keys = public_keys
++        .map_err(|e| actix_web::error::ErrorBadRequest(format!("Invalid public key: {}", e)))?;
++
++    let key_for_coeff = req
++        .key_for_coefficient
++        .as_ref()
++        .map(|key_str| Pubkey::from_str(key_str))
++        .transpose()
++        .map_err(|e| {
++            actix_web::error::ErrorBadRequest(format!("Invalid coefficient key: {}", e))
++        })?;
++
++    let agg_key = key_agg(public_keys, key_for_coeff)
++        .map_err(|e| actix_web::error::ErrorBadRequest(format!("Key aggregation failed: {}", e)))?;
++
++    let agg_pubkey = Pubkey::new(&*agg_key.agg_public_key.to_bytes(true));
++
++    let response = AggregateKeysResponse {
++        aggregated_public_key: agg_pubkey.to_string(),
++    };
++
+     Ok(HttpResponse::Ok().body("Hello, world!"))
+ }
+ 
+ async fn agg_send_step1() -> Result<HttpResponse, Error> {
++    let keypair_bytes = bs58::decode(&req.private_key)
++        .into_vec()
++        .map_err(|e| actix_web::error::ErrorBadRequest(format!("Invalid private key: {}", e)))?;
++
++    let keypair = Keypair::from_bytes(&keypair_bytes)
++        .map_err(|e| actix_web::error::ErrorBadRequest(format!("Invalid keypair: {}", e)))?;
++
++    let (message1, secret_state) = step_one(keypair);
++
++    let mut msg1_bytes = Vec::new();
++    message1.serialize(&mut msg1_bytes);
++
++    let mut secret_bytes = Vec::new();
++    secret_state.serialize(&mut secret_bytes);
++
++    let response = AggSendStep1Response {
++        message1: base64::encode(msg1_bytes),
++        secret_state: base64::encode(secret_bytes),
++    };
+     Ok(HttpResponse::Ok().body("Hello, world!"))
+ }
+ 
+ async fn agg_send_step2() -> Result<HttpResponse, Error> {
++    let keypair_bytes = bs58::decode(&req.private_key)
++        .into_vec()
++        .map_err(|e| actix_web::error::ErrorBadRequest(format!("Invalid private key: {}", e)))?;
++
++    let keypair = Keypair::from_bytes(&keypair_bytes)
++        .map_err(|e| actix_web::error::ErrorBadRequest(format!("Invalid keypair: {}", e)))?;
++
++    let to_pubkey = Pubkey::from_str(&req.to).map_err(|e| {
++        actix_web::error::ErrorBadRequest(format!("Invalid destination address: {}", e))
++    })?;
++
++    let recent_block_hash = Hash::from_str(&req.recent_block_hash)
++        .map_err(|e| actix_web::error::ErrorBadRequest(format!("Invalid block hash: {}", e)))?;
++
++    let public_keys: Result<Vec<Pubkey>, _> = req
++        .public_keys
++        .iter()
++        .map(|key_str| Pubkey::from_str(key_str))
++        .collect();
++    let public_keys = public_keys
++        .map_err(|e| actix_web::error::ErrorBadRequest(format!("Invalid public key: {}", e)))?;
++
++    // Deserialize first messages
++    let first_messages: Result<Vec<AggMessage1>, _> = req
++        .first_messages
++        .iter()
++        .map(|msg_str| {
++            let bytes =
++                base64::decode(msg_str).map_err(|e| format!("Base64 decode error: {}", e))?;
++            AggMessage1::deserialize(&bytes).map_err(|e| format!("Deserialization error: {}", e))
++        })
++        .collect();
++    let first_messages = first_messages.map_err(|e| actix_web::error::ErrorBadRequest(e))?;
++
++    // Deserialize secret state
++    let secret_bytes = base64::decode(&req.secret_state)
++        .map_err(|e| actix_web::error::ErrorBadRequest(format!("Invalid secret state: {}", e)))?;
++    let secret_state = SecretAggStepOne::deserialize(&secret_bytes)
++        .map_err(|e| actix_web::error::ErrorBadRequest(format!("Invalid secret state: {}", e)))?;
++
++    let partial_sig = step_two(
++        keypair,
++        req.amount,
++        to_pubkey,
++        req.memo.clone(),
++        recent_block_hash,
++        public_keys,
++        first_messages,
++        secret_state,
++    )
++    .map_err(|e| actix_web::error::ErrorBadRequest(format!("Step 2 failed: {}", e)))?;
++
++    let mut sig_bytes = Vec::new();
++    partial_sig.serialize(&mut sig_bytes);
++
++    let response = AggSendStep2Response {
++        partial_signature: base64::encode(sig_bytes),
++    };
+     Ok(HttpResponse::Ok().body("Hello, world!"))
+ }
+ 
+ async fn aggregate_signatures_broadcast() -> Result<HttpResponse, Error> {
++    let to_pubkey = Pubkey::from_str(&req.to).map_err(|e| {
++        actix_web::error::ErrorBadRequest(format!("Invalid destination address: {}", e))
++    })?;
++
++    let recent_block_hash = Hash::from_str(&req.recent_block_hash)
++        .map_err(|e| actix_web::error::ErrorBadRequest(format!("Invalid block hash: {}", e)))?;
++
++    let public_keys: Result<Vec<Pubkey>, _> = req
++        .public_keys
++        .iter()
++        .map(|key_str| Pubkey::from_str(key_str))
++        .collect();
++    let public_keys = public_keys
++        .map_err(|e| actix_web::error::ErrorBadRequest(format!("Invalid public key: {}", e)))?;
++
++    // Deserialize partial signatures
++    let partial_signatures: Result<Vec<PartialSignature>, _> = req
++        .partial_signatures
++        .iter()
++        .map(|sig_str| {
++            let bytes =
++                base64::decode(sig_str).map_err(|e| format!("Base64 decode error: {}", e))?;
++            PartialSignature::deserialize(&bytes)
++                .map_err(|e| format!("Deserialization error: {}", e))
++        })
++        .collect();
++    let partial_signatures =
++        partial_signatures.map_err(|e| actix_web::error::ErrorBadRequest(e))?;
++
++    let transaction = sign_and_broadcast(
++        req.amount,
++        to_pubkey,
++        req.memo.clone(),
++        recent_block_hash,
++        public_keys,
++        partial_signatures,
++    )
++    .map_err(|e| actix_web::error::ErrorBadRequest(format!("Aggregation failed: {}", e)))?;
++
++    let rpc_url = req
++        .rpc_url
++        .as_deref()
++        .unwrap_or("https://api.devnet.solana.com");
++    let client = RpcClient::new(rpc_url);
++
++    let signature = client
++        .send_and_confirm_transaction(&transaction)
++        .map_err(|e| {
++            actix_web::error::ErrorInternalServerError(format!("Failed to send transaction: {}", e))
++        })?;
++
++    let response = AggregateSigsBroadcastResponse {
++        transaction_signature: signature.to_string(),
++    };
++
+     Ok(HttpResponse::Ok().body("Hello, world!"))
+-}
+\ No newline at end of file
++}
++
++fn sol_to_lamports(sol: f64) -> u64 {
++    (sol * 1_000_000_000.0) as u64
++}
+diff --git a/mpc/src/native_token.rs b/mpc/src/native_token.rs
+new file mode 100644
+index 0000000..f794dd8
+--- /dev/null
++++ b/mpc/src/native_token.rs
+@@ -0,0 +1,33 @@
++use anchor_lang::prelude::*;
++
++pub fn lamports_to_sol(lamports: u64) -> f64 {
++    lamports as f64 / 1_000_000_000.0
++}
++
++pub fn sol_to_lamports(sol: f64) -> u64 {
++    (sol * 1_000_000_000.0) as u64
++}
++
++// Add this function to your tss.rs or create a separate transaction module
++pub fn create_unsigned_transaction(
++    amount: f64,
++    to: &Pubkey,
++    memo: Option<String>,
++    from: &Pubkey,
++) -> Transaction {
++    use solana_sdk::{system_instruction, transaction::Transaction};
++
++    let lamports = (amount * 1_000_000_000.0) as u64;
++    let mut instructions = vec![system_instruction::transfer(from, to, lamports)];
++
++    if let Some(memo_text) = memo {
++        let memo_instruction = solana_program::instruction::Instruction::new_with_bytes(
++            spl_memo::id(),
++            memo_text.as_bytes(),
++            vec![],
++        );
++        instructions.push(memo_instruction);
++    }
++
++    Transaction::new_with_payer(&instructions, Some(from))
++}
+diff --git a/mpc/src/serialization.rs b/mpc/src/serialization.rs
+index 336a908..bd83a61 100644
+--- a/mpc/src/serialization.rs
++++ b/mpc/src/serialization.rs
+@@ -1,9 +1,11 @@
+-use std::fmt::{Display, Formatter};
+-
++use crate::serialization::Error as DeserializationError;
+ use bs58::decode::Error as Bs58Error;
++use curv::elliptic::curves::{Ed25519, Point, Scalar};
++use multi_party_eddsa::protocols::musig2::{PrivatePartialNonces, PublicPartialNonces};
+ use solana_client::client_error::ClientError;
+-
+-use crate::serialization::Error as DeserializationError;
++use solana_sdk::{pubkey::Pubkey, signature::Signature};
++use std::fmt::{Display, Formatter};
++use std::fmt::{Display, Formatter};
+ 
+ #[derive(Debug)]
+ pub enum Error {
+@@ -15,29 +17,53 @@ pub enum Error {
+     ConfirmingTransactionFailed(ClientError),
+     BalaceFailed(ClientError),
+     SendTransactionFailed(ClientError),
+-    DeserializationFailed { error: DeserializationError, field_name: &'static str },
++    DeserializationFailed {
++        error: Box<DeserializationError>,
++        field_name: &'static str,
++    },
+     MismatchMessages,
+     InvalidSignature,
+     KeyPairIsNotInKeys,
++    InvalidPoint(curv::ErrorKey),
++    InvalidScalar(curv::ErrorKey),
++    BufferTooShort,
++    InvalidPubkey,
+ }
+ 
+ impl Display for Error {
+     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+         match self {
+-            Self::WrongNetwork(net) => write!(f, "Unrecognized network: {}, please select Mainnet/Testnet/Devnet", net),
++            Self::WrongNetwork(net) => write!(
++                f,
++                "Unrecognized network: {}, please select Mainnet/Testnet/Devnet",
++                net
++            ),
+             Self::BadBase58(e) => write!(f, "Based58 Error: {}", e),
+             Self::WrongKeyPair(e) => write!(f, "Failed deserializing keypair: {}", e),
+             Self::AirdropFailed(e) => write!(f, "Failed asking for an airdrop: {}", e),
+             Self::RecentHashFailed(e) => write!(f, "Failed recieving the latest hash: {}", e),
+-            Self::ConfirmingTransactionFailed(e) => write!(f, "Failed confirming transaction: {}", e),
++            Self::ConfirmingTransactionFailed(e) => {
++                write!(f, "Failed confirming transaction: {}", e)
++            }
+             Self::BalaceFailed(e) => write!(f, "Failed checking balance: {}", e),
+             Self::SendTransactionFailed(e) => write!(f, "Failed sending transaction: {}", e),
+             Self::DeserializationFailed { error, field_name } => {
+                 write!(f, "Failed deserializing {}: {}", field_name, error)
+             }
+-            Self::MismatchMessages => write!(f, "There is a mismatch between first_messages and second_messages"),
+-            Self::InvalidSignature => write!(f, "The resulting signature doesn't match the transaction"),
+-            Self::KeyPairIsNotInKeys => write!(f, "The provided keypair is not in the list of pubkeys"),
++            Self::MismatchMessages => write!(
++                f,
++                "There is a mismatch between first_messages and second_messages"
++            ),
++            Self::InvalidSignature => {
++                write!(f, "The resulting signature doesn't match the transaction")
++            }
++            Self::KeyPairIsNotInKeys => {
++                write!(f, "The provided keypair is not in the list of pubkeys")
++            }
++            Self::InvalidPoint(e) => write!(f, "Invalid point: {}", e),
++            Self::InvalidScalar(e) => write!(f, "Invalid scalar: {}", e),
++            Self::BufferTooShort => write!(f, "Buffer too short"),
++            Self::InvalidPubkey => write!(f, "Invalid public key"),
+         }
+     }
+ }
+@@ -54,4 +80,107 @@ impl From<ed25519_dalek::SignatureError> for Error {
+     }
+ }
+ 
+-impl std::error::Error for Error {}
+\ No newline at end of file
++impl std::error::Error for Error {}
++
++pub trait Serialize {
++    fn serialize(&self, buffer: &mut Vec<u8>);
++}
++
++pub trait Deserialize: Sized {
++    fn deserialize(buffer: &[u8]) -> Result<Self, Error>;
++}
++
++#[derive(Clone)]
++pub struct AggMessage1 {
++    pub sender: Pubkey,
++    pub public_nonces: PublicPartialNonces,
++}
++
++impl Serialize for AggMessage1 {
++    fn serialize(&self, buffer: &mut Vec<u8>) {
++        buffer.extend_from_slice(&self.sender.to_bytes());
++
++        // Serialize R values
++        for r in &self.public_nonces.R {
++            buffer.extend_from_slice(&r.to_bytes(true));
++        }
++    }
++}
++
++impl Deserialize for AggMessage1 {
++    fn deserialize(buffer: &[u8]) -> Result<Self, Error> {
++        if buffer.len() < 32 + 64 {
++            return Err(Error::BufferTooShort);
++        }
++
++        let sender = Pubkey::new(&buffer[0..32]);
++
++        let r1 = Point::from_bytes(&buffer[32..65]).map_err(Error::InvalidPoint)?;
++        let r2 = Point::from_bytes(&buffer[65..98]).map_err(Error::InvalidPoint)?;
++
++        let public_nonces = PublicPartialNonces { R: [r1, r2] };
++
++        Ok(AggMessage1 {
++            sender,
++            public_nonces,
++        })
++    }
++}
++
++pub struct SecretAggStepOne {
++    pub private_nonces: PrivatePartialNonces,
++    pub public_nonces: PublicPartialNonces,
++}
++
++impl Serialize for SecretAggStepOne {
++    fn serialize(&self, buffer: &mut Vec<u8>) {
++        // Serialize private nonces
++        for k in &self.private_nonces.k {
++            buffer.extend_from_slice(&k.to_bytes());
++        }
++
++        // Serialize public nonces
++        for r in &self.public_nonces.R {
++            buffer.extend_from_slice(&r.to_bytes(true));
++        }
++    }
++}
++
++impl Deserialize for SecretAggStepOne {
++    fn deserialize(buffer: &[u8]) -> Result<Self, Error> {
++        if buffer.len() < 128 {
++            return Err(Error::BufferTooShort);
++        }
++
++        let k1 = Scalar::from_bytes(&buffer[0..32]).map_err(Error::InvalidScalar)?;
++        let k2 = Scalar::from_bytes(&buffer[32..64]).map_err(Error::InvalidScalar)?;
++
++        let r1 = Point::from_bytes(&buffer[64..97]).map_err(Error::InvalidPoint)?;
++        let r2 = Point::from_bytes(&buffer[97..130]).map_err(Error::InvalidPoint)?;
++
++        Ok(SecretAggStepOne {
++            private_nonces: PrivatePartialNonces { k: [k1, k2] },
++            public_nonces: PublicPartialNonces { R: [r1, r2] },
++        })
++    }
++}
++
++#[derive(Clone)]
++pub struct PartialSignature(pub Signature);
++
++impl Serialize for PartialSignature {
++    fn serialize(&self, buffer: &mut Vec<u8>) {
++        buffer.extend_from_slice(&self.0.as_ref());
++    }
++}
++
++impl Deserialize for PartialSignature {
++    fn deserialize(buffer: &[u8]) -> Result<Self, Error> {
++        if buffer.len() < 64 {
++            return Err(Error::BufferTooShort);
++        }
++
++        let signature = Signature::new(&buffer[0..64]);
++        Ok(PartialSignature(signature))
++    }
++}
+diff --git a/mpc/src/tss.rs b/mpc/src/tss.rs
+index 0503fb3..074c4b5 100644
+--- a/mpc/src/tss.rs
++++ b/mpc/src/tss.rs
+@@ -1,13 +1,15 @@
+ #![allow(non_snake_case)]
+ 
+ use curv::elliptic::curves::{Ed25519, Point, Scalar};
+-use multi_party_eddsa::protocols::musig2::{self, PrivatePartialNonces, PublicPartialNonces};
+ use multi_party_eddsa::protocols::ExpandedKeyPair;
++use multi_party_eddsa::protocols::musig2::{self, PrivatePartialNonces, PublicPartialNonces};
+ use solana_sdk::signature::{Keypair, Signature, Signer, SignerError};
+ use solana_sdk::{hash::Hash, pubkey::Pubkey, transaction::Transaction};
+ 
+-use crate::serialization::{AggMessage1, Error as DeserializationError, PartialSignature, SecretAggStepOne};
+-use crate::{create_unsigned_transaction, Error};
++use crate::serialization::{
++    AggMessage1, Error as DeserializationError, PartialSignature, SecretAggStepOne,
++};
++use crate::{Error, create_unsigned_transaction};
+ 
+ /// Create the aggregate public key, pass key=None if you don't care about the coefficient
+ pub fn key_agg(keys: Vec<Pubkey>, key: Option<Pubkey>) -> Result<musig2::PublicKeyAgg, Error> {
+@@ -17,8 +19,13 @@ pub fn key_agg(keys: Vec<Pubkey>, key: Option<Pubkey>) -> Result<musig2::PublicK
+             field_name: "keys",
+         })
+     };
+-    let keys: Vec<_> = keys.into_iter().map(convert_keys).collect::<Result<_, _>>()?;
+-    let key = key.map(convert_keys).unwrap_or_else(|| Ok(keys[0].clone()))?;
++    let keys: Vec<_> = keys
++        .into_iter()
++        .map(convert_keys)
++        .collect::<Result<_, _>>()?;
++    let key = key
++        .map(convert_keys)
++        .unwrap_or_else(|| Ok(keys[0].clone()))?;
+     musig2::PublicKeyAgg::key_aggregation_n(keys, &key).ok_or(Error::KeyPairIsNotInKeys)
+ }
+ 
+@@ -29,8 +36,14 @@ pub fn step_one(keypair: Keypair) -> (AggMessage1, SecretAggStepOne) {
+     let (private_nonces, public_nonces) = musig2::generate_partial_nonces(&extended_kepair, None);
+ 
+     (
+-        AggMessage1 { sender: keypair.pubkey(), public_nonces: public_nonces.clone() },
+-        SecretAggStepOne { private_nonces, public_nonces },
++        AggMessage1 {
++            sender: keypair.pubkey(),
++            public_nonces: public_nonces.clone(),
++        },
++        SecretAggStepOne {
++            private_nonces,
++            public_nonces,
++        },
+     )
+ }
+ 
+@@ -45,7 +58,10 @@ pub fn step_two(
+     first_messages: Vec<AggMessage1>,
+     secret_state: SecretAggStepOne,
+ ) -> Result<PartialSignature, Error> {
+-    let other_nonces: Vec<_> = first_messages.into_iter().map(|msg1| msg1.public_nonces.R).collect();
++    let other_nonces: Vec<_> = first_messages
++        .into_iter()
++        .map(|msg1| msg1.public_nonces.R)
++        .collect();
+ 
+     // Generate the aggregate key together with the coefficient of the current keypair
+     let aggkey = key_agg(keys, Some(keypair.pubkey()))?;
+@@ -80,7 +96,11 @@ pub fn sign_and_broadcast(
+     let aggpubkey = Pubkey::new(&*aggkey.agg_public_key.to_bytes(true));
+ 
+     // Make sure all the `R`s are the same
+-    if !signatures[1..].iter().map(|s| &s.0.as_ref()[..32]).all(|s| s == &signatures[0].0.as_ref()[..32]) {
++    if !signatures[1..]
++        .iter()
++        .map(|s| &s.0.as_ref()[..32])
++        .all(|s| s == &signatures[0].0.as_ref()[..32])
++    {
+         return Err(Error::MismatchMessages);
+     }
+     let deserialize_R = |s| {
+@@ -101,8 +121,10 @@ pub fn sign_and_broadcast(
+         my_partial_s: deserialize_s(&signatures[0].0.as_ref()[32..])?,
+     };
+ 
+-    let partial_sigs: Vec<_> =
+-        signatures[1..].iter().map(|s| deserialize_s(&s.0.as_ref()[32..])).collect::<Result<_, _>>()?;
++    let partial_sigs: Vec<_> = signatures[1..]
++        .iter()
++        .map(|s| deserialize_s(&s.0.as_ref()[32..]))
++        .collect::<Result<_, _>>()?;
+ 
+     // Add the signatures up
+     let full_sig = musig2::aggregate_partial_signatures(&first_sig, &partial_sigs);
+@@ -136,7 +158,9 @@ struct PartialSigner {
+ 
+ impl Signer for PartialSigner {
+     fn try_pubkey(&self) -> Result<Pubkey, SignerError> {
+-        Ok(Pubkey::new(&*self.aggregated_pubkey.agg_public_key.to_bytes(true)))
++        Ok(Pubkey::new(
++            &*self.aggregated_pubkey.agg_public_key.to_bytes(true),
++        ))
+     }
+ 
+     fn try_sign_message(&self, message: &[u8]) -> Result<Signature, SignerError> {
+@@ -188,12 +212,14 @@ mod tests {
+         let aggpubkey_solana = Pubkey::new(&*aggpubkey.to_bytes(true));
+         let full_amount = 500_000_000;
+         // Get some money in it
+-        let testnet = TestValidator::with_no_fees(aggpubkey_solana, None, SocketAddrSpace::Unspecified);
++        let testnet =
++            TestValidator::with_no_fees(aggpubkey_solana, None, SocketAddrSpace::Unspecified);
+         let rpc_client = testnet.get_rpc_client();
+ 
+         // step 1
+         let to = Keypair::generate(&mut rng);
+-        let (first_msgs, first_secrets): (Vec<_>, Vec<_>) = keys.iter().map(clone_keypair).map(step_one).unzip();
++        let (first_msgs, first_secrets): (Vec<_>, Vec<_>) =
++            keys.iter().map(clone_keypair).map(step_one).unzip();
+ 
+         let recent_block_hash = rpc_client.get_latest_blockhash().unwrap();
+         // step 2
+@@ -208,15 +234,34 @@ mod tests {
+             .map(|(i, (key, secret))| {
+                 let mut first_msgs: Vec<_> = first_msgs.iter().map(clone_serialize).collect();
+                 first_msgs.remove(i);
+-                step_two(key, amount, to.pubkey(), memo.clone(), recent_block_hash, pubkeys.clone(), first_msgs, secret)
+-                    .unwrap()
++                step_two(
++                    key,
++                    amount,
++                    to.pubkey(),
++                    memo.clone(),
++                    recent_block_hash,
++                    pubkeys.clone(),
++                    first_msgs,
++                    secret,
++                )
++                .unwrap()
+             })
+             .collect();
+ 
+-        let full_tx = sign_and_broadcast(amount, to.pubkey(), memo, recent_block_hash, pubkeys, partial_sigs).unwrap();
++        let full_tx = sign_and_broadcast(
++            amount,
++            to.pubkey(),
++            memo,
++            recent_block_hash,
++            pubkeys,
++            partial_sigs,
++        )
++        .unwrap();
+         let sig = rpc_client.send_transaction(&full_tx).unwrap();
+ 
+         // Wait for confirmation
+-        rpc_client.confirm_transaction_with_spinner(&sig, &recent_block_hash, rpc_client.commitment()).unwrap();
++        rpc_client
++            .confirm_transaction_with_spinner(&sig, &recent_block_hash, rpc_client.commitment())
++            .unwrap();
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/store/.sqlx/query-07b1a79bafaeb4dca1fb95570465ea1daba2ed346eb15a79c62382c589457ec4.json b/store/.sqlx/query-07b1a79bafaeb4dca1fb95570465ea1daba2ed346eb15a79c62382c589457ec4.json
+new file mode 100644
+index 0000000..a98e197
+--- /dev/null
++++ b/store/.sqlx/query-07b1a79bafaeb4dca1fb95570465ea1daba2ed346eb15a79c62382c589457ec4.json
+@@ -0,0 +1,70 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "SELECT id, user_id, mpc_node_id, private_key_share, public_key, threshold, total_shares, created_at, updated_at\n             FROM mpc_keyshares WHERE mpc_node_id = $1 ORDER BY created_at",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 1,
++        "name": "user_id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 2,
++        "name": "mpc_node_id",
++        "type_info": "Int4"
++      },
++      {
++        "ordinal": 3,
++        "name": "private_key_share",
++        "type_info": "Text"
++      },
++      {
++        "ordinal": 4,
++        "name": "public_key",
++        "type_info": "Text"
++      },
++      {
++        "ordinal": 5,
++        "name": "threshold",
++        "type_info": "Int4"
++      },
++      {
++        "ordinal": 6,
++        "name": "total_shares",
++        "type_info": "Int4"
++      },
++      {
++        "ordinal": 7,
++        "name": "created_at",
++        "type_info": "Timestamptz"
++      },
++      {
++        "ordinal": 8,
++        "name": "updated_at",
++        "type_info": "Timestamptz"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Int4"
++      ]
++    },
++    "nullable": [
++      false,
++      false,
++      false,
++      false,
++      false,
++      false,
++      false,
++      true,
++      true
++    ]
++  },
++  "hash": "07b1a79bafaeb4dca1fb95570465ea1daba2ed346eb15a79c62382c589457ec4"
++}
+diff --git a/store/.sqlx/query-1153b675498a19ea40fe915b2593d2b51658cfc7cf2d5e60f9444f77d7a54d3b.json b/store/.sqlx/query-1153b675498a19ea40fe915b2593d2b51658cfc7cf2d5e60f9444f77d7a54d3b.json
+new file mode 100644
+index 0000000..711ab8d
+--- /dev/null
++++ b/store/.sqlx/query-1153b675498a19ea40fe915b2593d2b51658cfc7cf2d5e60f9444f77d7a54d3b.json
+@@ -0,0 +1,16 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "UPDATE users SET agg_pubkey = $1, updated_at = $2 WHERE id = $3",
++  "describe": {
++    "columns": [],
++    "parameters": {
++      "Left": [
++        "Text",
++        "Timestamptz",
++        "Uuid"
++      ]
++    },
++    "nullable": []
++  },
++  "hash": "1153b675498a19ea40fe915b2593d2b51658cfc7cf2d5e60f9444f77d7a54d3b"
++}
+diff --git a/store/.sqlx/query-1c05b63b87f98e4f7f3325c1b8dd4df18de77b436d4d3a3168f54033b2723168.json b/store/.sqlx/query-1c05b63b87f98e4f7f3325c1b8dd4df18de77b436d4d3a3168f54033b2723168.json
+new file mode 100644
+index 0000000..73408e6
+--- /dev/null
++++ b/store/.sqlx/query-1c05b63b87f98e4f7f3325c1b8dd4df18de77b436d4d3a3168f54033b2723168.json
+@@ -0,0 +1,24 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "UPDATE users SET balance = balance + $1, updated_at = $2 WHERE id = $3 RETURNING balance",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "balance",
++        "type_info": "Numeric"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Numeric",
++        "Timestamptz",
++        "Uuid"
++      ]
++    },
++    "nullable": [
++      true
++    ]
++  },
++  "hash": "1c05b63b87f98e4f7f3325c1b8dd4df18de77b436d4d3a3168f54033b2723168"
++}
+diff --git a/store/.sqlx/query-245a0c98288358dbef2d524192f2d6592246ecce8ab8f247b39d735adc8a3140.json b/store/.sqlx/query-245a0c98288358dbef2d524192f2d6592246ecce8ab8f247b39d735adc8a3140.json
+new file mode 100644
+index 0000000..ca97f68
+--- /dev/null
++++ b/store/.sqlx/query-245a0c98288358dbef2d524192f2d6592246ecce8ab8f247b39d735adc8a3140.json
+@@ -0,0 +1,25 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "UPDATE token_balances SET balance = balance - $1, updated_at = $2 \n             WHERE user_id = $3 AND token_mint = $4 \n             RETURNING balance",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "balance",
++        "type_info": "Numeric"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Numeric",
++        "Timestamptz",
++        "Uuid",
++        "Text"
++      ]
++    },
++    "nullable": [
++      true
++    ]
++  },
++  "hash": "245a0c98288358dbef2d524192f2d6592246ecce8ab8f247b39d735adc8a3140"
++}
+diff --git a/store/.sqlx/query-264f5c41f0d52f41964fe499431c4649661e5da4b3b8836b8ac0a785bb1b0f61.json b/store/.sqlx/query-264f5c41f0d52f41964fe499431c4649661e5da4b3b8836b8ac0a785bb1b0f61.json
+deleted file mode 100644
+index a44568c..0000000
+--- a/store/.sqlx/query-264f5c41f0d52f41964fe499431c4649661e5da4b3b8836b8ac0a785bb1b0f61.json
++++ /dev/null
+@@ -1,17 +0,0 @@
+-{
+-  "db_name": "PostgreSQL",
+-  "query": "INSERT INTO users (id, email, password_hash, created_at) VALUES ($1, $2, $3, $4)",
+-  "describe": {
+-    "columns": [],
+-    "parameters": {
+-      "Left": [
+-        "Varchar",
+-        "Varchar",
+-        "Varchar",
+-        "Timestamptz"
+-      ]
+-    },
+-    "nullable": []
+-  },
+-  "hash": "264f5c41f0d52f41964fe499431c4649661e5da4b3b8836b8ac0a785bb1b0f61"
+-}
+diff --git a/store/.sqlx/query-2e23fc2612dae9583baf9b91496e3b5378fc1374a840d14ee237299e1975c6e3.json b/store/.sqlx/query-2e23fc2612dae9583baf9b91496e3b5378fc1374a840d14ee237299e1975c6e3.json
+new file mode 100644
+index 0000000..d0ad8d1
+--- /dev/null
++++ b/store/.sqlx/query-2e23fc2612dae9583baf9b91496e3b5378fc1374a840d14ee237299e1975c6e3.json
+@@ -0,0 +1,52 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "SELECT id, email, agg_pubkey, balance, created_at, updated_at FROM users WHERE email = $1",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 1,
++        "name": "email",
++        "type_info": "Varchar"
++      },
++      {
++        "ordinal": 2,
++        "name": "agg_pubkey",
++        "type_info": "Text"
++      },
++      {
++        "ordinal": 3,
++        "name": "balance",
++        "type_info": "Numeric"
++      },
++      {
++        "ordinal": 4,
++        "name": "created_at",
++        "type_info": "Timestamptz"
++      },
++      {
++        "ordinal": 5,
++        "name": "updated_at",
++        "type_info": "Timestamptz"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Text"
++      ]
++    },
++    "nullable": [
++      false,
++      false,
++      true,
++      true,
++      true,
++      true
++    ]
++  },
++  "hash": "2e23fc2612dae9583baf9b91496e3b5378fc1374a840d14ee237299e1975c6e3"
++}
+diff --git a/store/.sqlx/query-31e14eff96bef8c7c2a3f1815601f0288d937f2da68c1c5101097d3805d5fdb9.json b/store/.sqlx/query-31e14eff96bef8c7c2a3f1815601f0288d937f2da68c1c5101097d3805d5fdb9.json
+new file mode 100644
+index 0000000..3b8861c
+--- /dev/null
++++ b/store/.sqlx/query-31e14eff96bef8c7c2a3f1815601f0288d937f2da68c1c5101097d3805d5fdb9.json
+@@ -0,0 +1,20 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "SELECT COUNT(*) FROM mpc_keyshares",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "count",
++        "type_info": "Int8"
++      }
++    ],
++    "parameters": {
++      "Left": []
++    },
++    "nullable": [
++      null
++    ]
++  },
++  "hash": "31e14eff96bef8c7c2a3f1815601f0288d937f2da68c1c5101097d3805d5fdb9"
++}
+diff --git a/store/.sqlx/query-39dcde70109b55cd65d4e632f3e761a1f2ca46198708ac7ee1b9cee82b344e78.json b/store/.sqlx/query-39dcde70109b55cd65d4e632f3e761a1f2ca46198708ac7ee1b9cee82b344e78.json
+new file mode 100644
+index 0000000..5bbeb92
+--- /dev/null
++++ b/store/.sqlx/query-39dcde70109b55cd65d4e632f3e761a1f2ca46198708ac7ee1b9cee82b344e78.json
+@@ -0,0 +1,17 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "UPDATE mpc_keyshares SET private_key_share = $1, updated_at = $2 \n             WHERE user_id = $3 AND mpc_node_id = $4",
++  "describe": {
++    "columns": [],
++    "parameters": {
++      "Left": [
++        "Text",
++        "Timestamptz",
++        "Uuid",
++        "Int4"
++      ]
++    },
++    "nullable": []
++  },
++  "hash": "39dcde70109b55cd65d4e632f3e761a1f2ca46198708ac7ee1b9cee82b344e78"
++}
+diff --git a/store/.sqlx/query-4560c237741ce9d4166aecd669770b3360a3ac71e649b293efb88d92c3254068.json b/store/.sqlx/query-4560c237741ce9d4166aecd669770b3360a3ac71e649b293efb88d92c3254068.json
+index e9b8716..b81fee7 100644
+--- a/store/.sqlx/query-4560c237741ce9d4166aecd669770b3360a3ac71e649b293efb88d92c3254068.json
++++ b/store/.sqlx/query-4560c237741ce9d4166aecd669770b3360a3ac71e649b293efb88d92c3254068.json
+@@ -6,7 +6,7 @@
+       {
+         "ordinal": 0,
+         "name": "id",
+-        "type_info": "Varchar"
++        "type_info": "Uuid"
+       }
+     ],
+     "parameters": {
+diff --git a/store/.sqlx/query-546353d46a85076f91c62b23bcc1ff51ecb9ed76e09e21c818ca1cd93f45d084.json b/store/.sqlx/query-546353d46a85076f91c62b23bcc1ff51ecb9ed76e09e21c818ca1cd93f45d084.json
+new file mode 100644
+index 0000000..198d566
+--- /dev/null
++++ b/store/.sqlx/query-546353d46a85076f91c62b23bcc1ff51ecb9ed76e09e21c818ca1cd93f45d084.json
+@@ -0,0 +1,53 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "SELECT id, email, agg_pubkey, balance, created_at, updated_at \n             FROM users ORDER BY created_at DESC LIMIT $1 OFFSET $2",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 1,
++        "name": "email",
++        "type_info": "Varchar"
++      },
++      {
++        "ordinal": 2,
++        "name": "agg_pubkey",
++        "type_info": "Text"
++      },
++      {
++        "ordinal": 3,
++        "name": "balance",
++        "type_info": "Numeric"
++      },
++      {
++        "ordinal": 4,
++        "name": "created_at",
++        "type_info": "Timestamptz"
++      },
++      {
++        "ordinal": 5,
++        "name": "updated_at",
++        "type_info": "Timestamptz"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Int8",
++        "Int8"
++      ]
++    },
++    "nullable": [
++      false,
++      false,
++      true,
++      true,
++      true,
++      true
++    ]
++  },
++  "hash": "546353d46a85076f91c62b23bcc1ff51ecb9ed76e09e21c818ca1cd93f45d084"
++}
+diff --git a/store/.sqlx/query-5bd761e972c34e4bc74d204fde864cbce1769118bc2e84ab071d1c8f12e94aab.json b/store/.sqlx/query-5bd761e972c34e4bc74d204fde864cbce1769118bc2e84ab071d1c8f12e94aab.json
+new file mode 100644
+index 0000000..40f8fdd
+--- /dev/null
++++ b/store/.sqlx/query-5bd761e972c34e4bc74d204fde864cbce1769118bc2e84ab071d1c8f12e94aab.json
+@@ -0,0 +1,20 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "SELECT COUNT(DISTINCT user_id) FROM mpc_keyshares",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "count",
++        "type_info": "Int8"
++      }
++    ],
++    "parameters": {
++      "Left": []
++    },
++    "nullable": [
++      null
++    ]
++  },
++  "hash": "5bd761e972c34e4bc74d204fde864cbce1769118bc2e84ab071d1c8f12e94aab"
++}
+diff --git a/store/.sqlx/query-6c6c82a6b46becb059d24724fea10e7ef44414fef325645a47536ce3bd44c469.json b/store/.sqlx/query-6c6c82a6b46becb059d24724fea10e7ef44414fef325645a47536ce3bd44c469.json
+new file mode 100644
+index 0000000..fe6f8fe
+--- /dev/null
++++ b/store/.sqlx/query-6c6c82a6b46becb059d24724fea10e7ef44414fef325645a47536ce3bd44c469.json
+@@ -0,0 +1,23 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "SELECT balance FROM token_balances WHERE user_id = $1 AND token_mint = $2",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "balance",
++        "type_info": "Numeric"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Uuid",
++        "Text"
++      ]
++    },
++    "nullable": [
++      true
++    ]
++  },
++  "hash": "6c6c82a6b46becb059d24724fea10e7ef44414fef325645a47536ce3bd44c469"
++}
+diff --git a/store/.sqlx/query-71d607695109d56fcb9fb6ac86fed5e505b1837b34b7371f5c547ae6f9db90a5.json b/store/.sqlx/query-71d607695109d56fcb9fb6ac86fed5e505b1837b34b7371f5c547ae6f9db90a5.json
+new file mode 100644
+index 0000000..a164a73
+--- /dev/null
++++ b/store/.sqlx/query-71d607695109d56fcb9fb6ac86fed5e505b1837b34b7371f5c547ae6f9db90a5.json
+@@ -0,0 +1,52 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "SELECT id, email, agg_pubkey, balance, created_at, updated_at FROM users WHERE id = $1",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 1,
++        "name": "email",
++        "type_info": "Varchar"
++      },
++      {
++        "ordinal": 2,
++        "name": "agg_pubkey",
++        "type_info": "Text"
++      },
++      {
++        "ordinal": 3,
++        "name": "balance",
++        "type_info": "Numeric"
++      },
++      {
++        "ordinal": 4,
++        "name": "created_at",
++        "type_info": "Timestamptz"
++      },
++      {
++        "ordinal": 5,
++        "name": "updated_at",
++        "type_info": "Timestamptz"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Uuid"
++      ]
++    },
++    "nullable": [
++      false,
++      false,
++      true,
++      true,
++      true,
++      true
++    ]
++  },
++  "hash": "71d607695109d56fcb9fb6ac86fed5e505b1837b34b7371f5c547ae6f9db90a5"
++}
+diff --git a/store/.sqlx/query-82228d1a70211fc89a337b8a4d71642b990c3573426b5ca7c92533f4d87915e1.json b/store/.sqlx/query-82228d1a70211fc89a337b8a4d71642b990c3573426b5ca7c92533f4d87915e1.json
+new file mode 100644
+index 0000000..0fdf230
+--- /dev/null
++++ b/store/.sqlx/query-82228d1a70211fc89a337b8a4d71642b990c3573426b5ca7c92533f4d87915e1.json
+@@ -0,0 +1,76 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "\n                INSERT INTO mpc_keyshares (user_id, mpc_node_id, private_key_share, public_key, threshold, total_shares, created_at, updated_at)\n                VALUES ($1, $2, $3, $4, $5, $6, $7, $7)\n                RETURNING id, user_id, mpc_node_id, private_key_share, public_key, threshold, total_shares, created_at, updated_at\n                ",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 1,
++        "name": "user_id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 2,
++        "name": "mpc_node_id",
++        "type_info": "Int4"
++      },
++      {
++        "ordinal": 3,
++        "name": "private_key_share",
++        "type_info": "Text"
++      },
++      {
++        "ordinal": 4,
++        "name": "public_key",
++        "type_info": "Text"
++      },
++      {
++        "ordinal": 5,
++        "name": "threshold",
++        "type_info": "Int4"
++      },
++      {
++        "ordinal": 6,
++        "name": "total_shares",
++        "type_info": "Int4"
++      },
++      {
++        "ordinal": 7,
++        "name": "created_at",
++        "type_info": "Timestamptz"
++      },
++      {
++        "ordinal": 8,
++        "name": "updated_at",
++        "type_info": "Timestamptz"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Uuid",
++        "Int4",
++        "Text",
++        "Text",
++        "Int4",
++        "Int4",
++        "Timestamptz"
++      ]
++    },
++    "nullable": [
++      false,
++      false,
++      false,
++      false,
++      false,
++      false,
++      false,
++      true,
++      true
++    ]
++  },
++  "hash": "82228d1a70211fc89a337b8a4d71642b990c3573426b5ca7c92533f4d87915e1"
++}
+diff --git a/store/.sqlx/query-88f26472e41c0381a8945804164c12fdc502c55c9bb4f90d64fd38d953e0d5f5.json b/store/.sqlx/query-88f26472e41c0381a8945804164c12fdc502c55c9bb4f90d64fd38d953e0d5f5.json
+new file mode 100644
+index 0000000..80f3363
+--- /dev/null
++++ b/store/.sqlx/query-88f26472e41c0381a8945804164c12fdc502c55c9bb4f90d64fd38d953e0d5f5.json
+@@ -0,0 +1,22 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "SELECT id FROM users WHERE id = $1",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "id",
++        "type_info": "Uuid"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Uuid"
++      ]
++    },
++    "nullable": [
++      false
++    ]
++  },
++  "hash": "88f26472e41c0381a8945804164c12fdc502c55c9bb4f90d64fd38d953e0d5f5"
++}
+diff --git a/store/.sqlx/query-96c6d22aa364cdd0e57958f1a311195672a70fbe3d21572c6e65d8df071dad1b.json b/store/.sqlx/query-96c6d22aa364cdd0e57958f1a311195672a70fbe3d21572c6e65d8df071dad1b.json
+new file mode 100644
+index 0000000..e61624b
+--- /dev/null
++++ b/store/.sqlx/query-96c6d22aa364cdd0e57958f1a311195672a70fbe3d21572c6e65d8df071dad1b.json
+@@ -0,0 +1,20 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "SELECT COUNT(DISTINCT mpc_node_id) FROM mpc_keyshares",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "count",
++        "type_info": "Int8"
++      }
++    ],
++    "parameters": {
++      "Left": []
++    },
++    "nullable": [
++      null
++    ]
++  },
++  "hash": "96c6d22aa364cdd0e57958f1a311195672a70fbe3d21572c6e65d8df071dad1b"
++}
+diff --git a/store/.sqlx/query-a3983a9ffa865f130d8c4c49f0664b7383da5cf0d971ad8e3f0e353ffb667492.json b/store/.sqlx/query-a3983a9ffa865f130d8c4c49f0664b7383da5cf0d971ad8e3f0e353ffb667492.json
+new file mode 100644
+index 0000000..7d2919d
+--- /dev/null
++++ b/store/.sqlx/query-a3983a9ffa865f130d8c4c49f0664b7383da5cf0d971ad8e3f0e353ffb667492.json
+@@ -0,0 +1,69 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "\n            INSERT INTO token_balances (user_id, token_mint, token_symbol, balance, decimals, created_at, updated_at)\n            VALUES ($1, $2, $3, $4, $5, $6, $6)\n            ON CONFLICT (user_id, token_mint) \n            DO UPDATE SET \n                balance = EXCLUDED.balance,\n                token_symbol = EXCLUDED.token_symbol,\n                decimals = EXCLUDED.decimals,\n                updated_at = EXCLUDED.updated_at\n            RETURNING id, user_id, token_mint, token_symbol, balance, decimals, created_at, updated_at\n            ",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 1,
++        "name": "user_id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 2,
++        "name": "token_mint",
++        "type_info": "Varchar"
++      },
++      {
++        "ordinal": 3,
++        "name": "token_symbol",
++        "type_info": "Varchar"
++      },
++      {
++        "ordinal": 4,
++        "name": "balance",
++        "type_info": "Numeric"
++      },
++      {
++        "ordinal": 5,
++        "name": "decimals",
++        "type_info": "Int4"
++      },
++      {
++        "ordinal": 6,
++        "name": "created_at",
++        "type_info": "Timestamptz"
++      },
++      {
++        "ordinal": 7,
++        "name": "updated_at",
++        "type_info": "Timestamptz"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Uuid",
++        "Varchar",
++        "Varchar",
++        "Numeric",
++        "Int4",
++        "Timestamptz"
++      ]
++    },
++    "nullable": [
++      false,
++      false,
++      false,
++      false,
++      true,
++      false,
++      true,
++      true
++    ]
++  },
++  "hash": "a3983a9ffa865f130d8c4c49f0664b7383da5cf0d971ad8e3f0e353ffb667492"
++}
+diff --git a/store/.sqlx/query-af1d34634511170f850175c28e69f02f619e56001ab5c431112c61679e4117fc.json b/store/.sqlx/query-af1d34634511170f850175c28e69f02f619e56001ab5c431112c61679e4117fc.json
+new file mode 100644
+index 0000000..fde3829
+--- /dev/null
++++ b/store/.sqlx/query-af1d34634511170f850175c28e69f02f619e56001ab5c431112c61679e4117fc.json
+@@ -0,0 +1,22 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "SELECT COUNT(*) FROM token_balances WHERE user_id = $1",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "count",
++        "type_info": "Int8"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Uuid"
++      ]
++    },
++    "nullable": [
++      null
++    ]
++  },
++  "hash": "af1d34634511170f850175c28e69f02f619e56001ab5c431112c61679e4117fc"
++}
+diff --git a/store/.sqlx/query-b6fdb095d77e057f758ea5769e52d0773721ecb7595961582a8fb0a0710a588b.json b/store/.sqlx/query-b6fdb095d77e057f758ea5769e52d0773721ecb7595961582a8fb0a0710a588b.json
+new file mode 100644
+index 0000000..ce7cd54
+--- /dev/null
++++ b/store/.sqlx/query-b6fdb095d77e057f758ea5769e52d0773721ecb7595961582a8fb0a0710a588b.json
+@@ -0,0 +1,58 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "SELECT id, email, password_hash, agg_pubkey, balance, created_at, updated_at FROM users WHERE email = $1",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 1,
++        "name": "email",
++        "type_info": "Varchar"
++      },
++      {
++        "ordinal": 2,
++        "name": "password_hash",
++        "type_info": "Text"
++      },
++      {
++        "ordinal": 3,
++        "name": "agg_pubkey",
++        "type_info": "Text"
++      },
++      {
++        "ordinal": 4,
++        "name": "balance",
++        "type_info": "Numeric"
++      },
++      {
++        "ordinal": 5,
++        "name": "created_at",
++        "type_info": "Timestamptz"
++      },
++      {
++        "ordinal": 6,
++        "name": "updated_at",
++        "type_info": "Timestamptz"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Text"
++      ]
++    },
++    "nullable": [
++      false,
++      false,
++      false,
++      true,
++      true,
++      true,
++      true
++    ]
++  },
++  "hash": "b6fdb095d77e057f758ea5769e52d0773721ecb7595961582a8fb0a0710a588b"
++}
+diff --git a/store/.sqlx/query-be1387b533b85a170b8d5971302f5b4326ad479f830317eb4991de1938dcd9a7.json b/store/.sqlx/query-be1387b533b85a170b8d5971302f5b4326ad479f830317eb4991de1938dcd9a7.json
+new file mode 100644
+index 0000000..09b1074
+--- /dev/null
++++ b/store/.sqlx/query-be1387b533b85a170b8d5971302f5b4326ad479f830317eb4991de1938dcd9a7.json
+@@ -0,0 +1,25 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "\n            INSERT INTO token_balances (user_id, token_mint, token_symbol, balance, decimals, created_at, updated_at)\n            VALUES ($1, $2, 'UNKNOWN', $3, 6, $4, $4)\n            ON CONFLICT (user_id, token_mint) \n            DO UPDATE SET \n                balance = token_balances.balance + EXCLUDED.balance,\n                updated_at = EXCLUDED.updated_at\n            RETURNING balance\n            ",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "balance",
++        "type_info": "Numeric"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Uuid",
++        "Varchar",
++        "Numeric",
++        "Timestamptz"
++      ]
++    },
++    "nullable": [
++      true
++    ]
++  },
++  "hash": "be1387b533b85a170b8d5971302f5b4326ad479f830317eb4991de1938dcd9a7"
++}
+diff --git a/store/.sqlx/query-bee698cfe3902c4fcbf54a9b7f264dc410c9aae8ad7efc4a535947238c0b7b6e.json b/store/.sqlx/query-bee698cfe3902c4fcbf54a9b7f264dc410c9aae8ad7efc4a535947238c0b7b6e.json
+new file mode 100644
+index 0000000..667bdce
+--- /dev/null
++++ b/store/.sqlx/query-bee698cfe3902c4fcbf54a9b7f264dc410c9aae8ad7efc4a535947238c0b7b6e.json
+@@ -0,0 +1,71 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "SELECT id, user_id, mpc_node_id, private_key_share, public_key, threshold, total_shares, created_at, updated_at\n             FROM mpc_keyshares WHERE user_id = $1 AND mpc_node_id = $2",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 1,
++        "name": "user_id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 2,
++        "name": "mpc_node_id",
++        "type_info": "Int4"
++      },
++      {
++        "ordinal": 3,
++        "name": "private_key_share",
++        "type_info": "Text"
++      },
++      {
++        "ordinal": 4,
++        "name": "public_key",
++        "type_info": "Text"
++      },
++      {
++        "ordinal": 5,
++        "name": "threshold",
++        "type_info": "Int4"
++      },
++      {
++        "ordinal": 6,
++        "name": "total_shares",
++        "type_info": "Int4"
++      },
++      {
++        "ordinal": 7,
++        "name": "created_at",
++        "type_info": "Timestamptz"
++      },
++      {
++        "ordinal": 8,
++        "name": "updated_at",
++        "type_info": "Timestamptz"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Uuid",
++        "Int4"
++      ]
++    },
++    "nullable": [
++      false,
++      false,
++      false,
++      false,
++      false,
++      false,
++      false,
++      true,
++      true
++    ]
++  },
++  "hash": "bee698cfe3902c4fcbf54a9b7f264dc410c9aae8ad7efc4a535947238c0b7b6e"
++}
+diff --git a/store/.sqlx/query-c33d08c4381868102736f67e7d22cacb6853825ac61db1ed6cc223956e2924ab.json b/store/.sqlx/query-c33d08c4381868102736f67e7d22cacb6853825ac61db1ed6cc223956e2924ab.json
+new file mode 100644
+index 0000000..fd7362e
+--- /dev/null
++++ b/store/.sqlx/query-c33d08c4381868102736f67e7d22cacb6853825ac61db1ed6cc223956e2924ab.json
+@@ -0,0 +1,70 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "SELECT id, user_id, mpc_node_id, private_key_share, public_key, threshold, total_shares, created_at, updated_at\n             FROM mpc_keyshares WHERE user_id = $1 ORDER BY mpc_node_id",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 1,
++        "name": "user_id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 2,
++        "name": "mpc_node_id",
++        "type_info": "Int4"
++      },
++      {
++        "ordinal": 3,
++        "name": "private_key_share",
++        "type_info": "Text"
++      },
++      {
++        "ordinal": 4,
++        "name": "public_key",
++        "type_info": "Text"
++      },
++      {
++        "ordinal": 5,
++        "name": "threshold",
++        "type_info": "Int4"
++      },
++      {
++        "ordinal": 6,
++        "name": "total_shares",
++        "type_info": "Int4"
++      },
++      {
++        "ordinal": 7,
++        "name": "created_at",
++        "type_info": "Timestamptz"
++      },
++      {
++        "ordinal": 8,
++        "name": "updated_at",
++        "type_info": "Timestamptz"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Uuid"
++      ]
++    },
++    "nullable": [
++      false,
++      false,
++      false,
++      false,
++      false,
++      false,
++      false,
++      true,
++      true
++    ]
++  },
++  "hash": "c33d08c4381868102736f67e7d22cacb6853825ac61db1ed6cc223956e2924ab"
++}
+diff --git a/store/.sqlx/query-ca2173fbceab2e40561d603e87738fb5f8c4332773958ccad4f95d01094ccbe7.json b/store/.sqlx/query-ca2173fbceab2e40561d603e87738fb5f8c4332773958ccad4f95d01094ccbe7.json
+new file mode 100644
+index 0000000..950e7ec
+--- /dev/null
++++ b/store/.sqlx/query-ca2173fbceab2e40561d603e87738fb5f8c4332773958ccad4f95d01094ccbe7.json
+@@ -0,0 +1,76 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "\n            INSERT INTO mpc_keyshares (user_id, mpc_node_id, private_key_share, public_key, threshold, total_shares, created_at, updated_at)\n            VALUES ($1, $2, $3, $4, $5, $6, $7, $7)\n            RETURNING id, user_id, mpc_node_id, private_key_share, public_key, threshold, total_shares, created_at, updated_at\n            ",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 1,
++        "name": "user_id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 2,
++        "name": "mpc_node_id",
++        "type_info": "Int4"
++      },
++      {
++        "ordinal": 3,
++        "name": "private_key_share",
++        "type_info": "Text"
++      },
++      {
++        "ordinal": 4,
++        "name": "public_key",
++        "type_info": "Text"
++      },
++      {
++        "ordinal": 5,
++        "name": "threshold",
++        "type_info": "Int4"
++      },
++      {
++        "ordinal": 6,
++        "name": "total_shares",
++        "type_info": "Int4"
++      },
++      {
++        "ordinal": 7,
++        "name": "created_at",
++        "type_info": "Timestamptz"
++      },
++      {
++        "ordinal": 8,
++        "name": "updated_at",
++        "type_info": "Timestamptz"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Uuid",
++        "Int4",
++        "Text",
++        "Text",
++        "Int4",
++        "Int4",
++        "Timestamptz"
++      ]
++    },
++    "nullable": [
++      false,
++      false,
++      false,
++      false,
++      false,
++      false,
++      false,
++      true,
++      true
++    ]
++  },
++  "hash": "ca2173fbceab2e40561d603e87738fb5f8c4332773958ccad4f95d01094ccbe7"
++}
+diff --git a/store/.sqlx/query-cb40de7df7d25cba877d96f444188bb7bc762ca4e09d4a0ea3b0b3e863a2b3df.json b/store/.sqlx/query-cb40de7df7d25cba877d96f444188bb7bc762ca4e09d4a0ea3b0b3e863a2b3df.json
+new file mode 100644
+index 0000000..cb5ef8d
+--- /dev/null
++++ b/store/.sqlx/query-cb40de7df7d25cba877d96f444188bb7bc762ca4e09d4a0ea3b0b3e863a2b3df.json
+@@ -0,0 +1,64 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "SELECT id, user_id, token_mint, token_symbol, balance, decimals, created_at, updated_at \n             FROM token_balances WHERE user_id = $1 ORDER BY token_symbol",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 1,
++        "name": "user_id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 2,
++        "name": "token_mint",
++        "type_info": "Varchar"
++      },
++      {
++        "ordinal": 3,
++        "name": "token_symbol",
++        "type_info": "Varchar"
++      },
++      {
++        "ordinal": 4,
++        "name": "balance",
++        "type_info": "Numeric"
++      },
++      {
++        "ordinal": 5,
++        "name": "decimals",
++        "type_info": "Int4"
++      },
++      {
++        "ordinal": 6,
++        "name": "created_at",
++        "type_info": "Timestamptz"
++      },
++      {
++        "ordinal": 7,
++        "name": "updated_at",
++        "type_info": "Timestamptz"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Uuid"
++      ]
++    },
++    "nullable": [
++      false,
++      false,
++      false,
++      false,
++      true,
++      false,
++      true,
++      true
++    ]
++  },
++  "hash": "cb40de7df7d25cba877d96f444188bb7bc762ca4e09d4a0ea3b0b3e863a2b3df"
++}
+diff --git a/store/.sqlx/query-d61192941805ec09d7562d0f4a419ed55c097fc7ee46d9f842b48259316790c2.json b/store/.sqlx/query-d61192941805ec09d7562d0f4a419ed55c097fc7ee46d9f842b48259316790c2.json
+new file mode 100644
+index 0000000..d393900
+--- /dev/null
++++ b/store/.sqlx/query-d61192941805ec09d7562d0f4a419ed55c097fc7ee46d9f842b48259316790c2.json
+@@ -0,0 +1,55 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "\n            INSERT INTO users (email, password_hash, balance, created_at, updated_at)\n            VALUES ($1, $2, $3, $4, $4)\n            RETURNING id, email, agg_pubkey, balance, created_at, updated_at\n            ",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 1,
++        "name": "email",
++        "type_info": "Varchar"
++      },
++      {
++        "ordinal": 2,
++        "name": "agg_pubkey",
++        "type_info": "Text"
++      },
++      {
++        "ordinal": 3,
++        "name": "balance",
++        "type_info": "Numeric"
++      },
++      {
++        "ordinal": 4,
++        "name": "created_at",
++        "type_info": "Timestamptz"
++      },
++      {
++        "ordinal": 5,
++        "name": "updated_at",
++        "type_info": "Timestamptz"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Varchar",
++        "Text",
++        "Numeric",
++        "Timestamptz"
++      ]
++    },
++    "nullable": [
++      false,
++      false,
++      true,
++      true,
++      true,
++      true
++    ]
++  },
++  "hash": "d61192941805ec09d7562d0f4a419ed55c097fc7ee46d9f842b48259316790c2"
++}
+diff --git a/store/.sqlx/query-db3465a4a87e5579b6c3518862ed9a3f8c9df102eb920ded61e43c3e2bcd6d64.json b/store/.sqlx/query-db3465a4a87e5579b6c3518862ed9a3f8c9df102eb920ded61e43c3e2bcd6d64.json
+new file mode 100644
+index 0000000..3ec5851
+--- /dev/null
++++ b/store/.sqlx/query-db3465a4a87e5579b6c3518862ed9a3f8c9df102eb920ded61e43c3e2bcd6d64.json
+@@ -0,0 +1,22 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "SELECT COUNT(*) FROM mpc_keyshares WHERE user_id = $1",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "count",
++        "type_info": "Int8"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Uuid"
++      ]
++    },
++    "nullable": [
++      null
++    ]
++  },
++  "hash": "db3465a4a87e5579b6c3518862ed9a3f8c9df102eb920ded61e43c3e2bcd6d64"
++}
+diff --git a/store/.sqlx/query-dc64e1d25d9ced3a49130cee99f6edc3f70a4917910cf3b76faefc24ac32159d.json b/store/.sqlx/query-dc64e1d25d9ced3a49130cee99f6edc3f70a4917910cf3b76faefc24ac32159d.json
+new file mode 100644
+index 0000000..c958e8d
+--- /dev/null
++++ b/store/.sqlx/query-dc64e1d25d9ced3a49130cee99f6edc3f70a4917910cf3b76faefc24ac32159d.json
+@@ -0,0 +1,20 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "SELECT COUNT(*) FROM users",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "count",
++        "type_info": "Int8"
++      }
++    ],
++    "parameters": {
++      "Left": []
++    },
++    "nullable": [
++      null
++    ]
++  },
++  "hash": "dc64e1d25d9ced3a49130cee99f6edc3f70a4917910cf3b76faefc24ac32159d"
++}
+diff --git a/store/.sqlx/query-e47922b4c1a8655988b5e732758e0518ddb141ed09643e9f89670a51a8560365.json b/store/.sqlx/query-e47922b4c1a8655988b5e732758e0518ddb141ed09643e9f89670a51a8560365.json
+new file mode 100644
+index 0000000..5936300
+--- /dev/null
++++ b/store/.sqlx/query-e47922b4c1a8655988b5e732758e0518ddb141ed09643e9f89670a51a8560365.json
+@@ -0,0 +1,22 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "SELECT balance FROM users WHERE id = $1",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "balance",
++        "type_info": "Numeric"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Uuid"
++      ]
++    },
++    "nullable": [
++      true
++    ]
++  },
++  "hash": "e47922b4c1a8655988b5e732758e0518ddb141ed09643e9f89670a51a8560365"
++}
+diff --git a/store/.sqlx/query-e4df432c40e90d4f6c1d54e4801ca44ff2ed86fed7c51ee67f892882a46c151f.json b/store/.sqlx/query-e4df432c40e90d4f6c1d54e4801ca44ff2ed86fed7c51ee67f892882a46c151f.json
+new file mode 100644
+index 0000000..d63e828
+--- /dev/null
++++ b/store/.sqlx/query-e4df432c40e90d4f6c1d54e4801ca44ff2ed86fed7c51ee67f892882a46c151f.json
+@@ -0,0 +1,23 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "SELECT id FROM mpc_keyshares WHERE user_id = $1 AND mpc_node_id = $2",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "id",
++        "type_info": "Uuid"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Uuid",
++        "Int4"
++      ]
++    },
++    "nullable": [
++      false
++    ]
++  },
++  "hash": "e4df432c40e90d4f6c1d54e4801ca44ff2ed86fed7c51ee67f892882a46c151f"
++}
+diff --git a/store/.sqlx/query-e5ee845473e83a89338e9296e21aacdfc0d711abaa18bec4eb3b6890410bf0f5.json b/store/.sqlx/query-e5ee845473e83a89338e9296e21aacdfc0d711abaa18bec4eb3b6890410bf0f5.json
+new file mode 100644
+index 0000000..3bd3b8d
+--- /dev/null
++++ b/store/.sqlx/query-e5ee845473e83a89338e9296e21aacdfc0d711abaa18bec4eb3b6890410bf0f5.json
+@@ -0,0 +1,16 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "UPDATE users SET balance = $1, updated_at = $2 WHERE id = $3",
++  "describe": {
++    "columns": [],
++    "parameters": {
++      "Left": [
++        "Numeric",
++        "Timestamptz",
++        "Uuid"
++      ]
++    },
++    "nullable": []
++  },
++  "hash": "e5ee845473e83a89338e9296e21aacdfc0d711abaa18bec4eb3b6890410bf0f5"
++}
+diff --git a/store/.sqlx/query-e6f7d7606f9f4fbbd792da3b06f3b41a31f420e942d2ce5e20b7b0bc0aba53fd.json b/store/.sqlx/query-e6f7d7606f9f4fbbd792da3b06f3b41a31f420e942d2ce5e20b7b0bc0aba53fd.json
+new file mode 100644
+index 0000000..c36ad1f
+--- /dev/null
++++ b/store/.sqlx/query-e6f7d7606f9f4fbbd792da3b06f3b41a31f420e942d2ce5e20b7b0bc0aba53fd.json
+@@ -0,0 +1,64 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "SELECT id, user_id, token_mint, token_symbol, balance, decimals, created_at, updated_at\n             FROM token_balances WHERE user_id = $1 ORDER BY token_symbol",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 1,
++        "name": "user_id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 2,
++        "name": "token_mint",
++        "type_info": "Varchar"
++      },
++      {
++        "ordinal": 3,
++        "name": "token_symbol",
++        "type_info": "Varchar"
++      },
++      {
++        "ordinal": 4,
++        "name": "balance",
++        "type_info": "Numeric"
++      },
++      {
++        "ordinal": 5,
++        "name": "decimals",
++        "type_info": "Int4"
++      },
++      {
++        "ordinal": 6,
++        "name": "created_at",
++        "type_info": "Timestamptz"
++      },
++      {
++        "ordinal": 7,
++        "name": "updated_at",
++        "type_info": "Timestamptz"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Uuid"
++      ]
++    },
++    "nullable": [
++      false,
++      false,
++      false,
++      false,
++      true,
++      false,
++      true,
++      true
++    ]
++  },
++  "hash": "e6f7d7606f9f4fbbd792da3b06f3b41a31f420e942d2ce5e20b7b0bc0aba53fd"
++}
+diff --git a/store/.sqlx/query-eb969f732e442ce3b81eba84e0989e93732b85ebc5383bfdebd9fe1009343386.json b/store/.sqlx/query-eb969f732e442ce3b81eba84e0989e93732b85ebc5383bfdebd9fe1009343386.json
+new file mode 100644
+index 0000000..e233dc9
+--- /dev/null
++++ b/store/.sqlx/query-eb969f732e442ce3b81eba84e0989e93732b85ebc5383bfdebd9fe1009343386.json
+@@ -0,0 +1,24 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "UPDATE users SET balance = balance - $1, updated_at = $2 WHERE id = $3 RETURNING balance",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "balance",
++        "type_info": "Numeric"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Numeric",
++        "Timestamptz",
++        "Uuid"
++      ]
++    },
++    "nullable": [
++      true
++    ]
++  },
++  "hash": "eb969f732e442ce3b81eba84e0989e93732b85ebc5383bfdebd9fe1009343386"
++}
+diff --git a/store/.sqlx/query-f4a40d052c44db0f9f55b01df5ce8766bd5eaba010c2deaa6e3bedc53f7be8b8.json b/store/.sqlx/query-f4a40d052c44db0f9f55b01df5ce8766bd5eaba010c2deaa6e3bedc53f7be8b8.json
+new file mode 100644
+index 0000000..cb7d322
+--- /dev/null
++++ b/store/.sqlx/query-f4a40d052c44db0f9f55b01df5ce8766bd5eaba010c2deaa6e3bedc53f7be8b8.json
+@@ -0,0 +1,25 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "UPDATE token_balances SET balance = balance + $1, updated_at = $2 \n             WHERE user_id = $3 AND token_mint = $4 \n             RETURNING balance",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "balance",
++        "type_info": "Numeric"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Numeric",
++        "Timestamptz",
++        "Uuid",
++        "Text"
++      ]
++    },
++    "nullable": [
++      true
++    ]
++  },
++  "hash": "f4a40d052c44db0f9f55b01df5ce8766bd5eaba010c2deaa6e3bedc53f7be8b8"
++}
+diff --git a/store/.sqlx/query-fba1e93b14ac655c9fbba7bab752073f0ae95134781b0804d7bd6c2dbbbc65a8.json b/store/.sqlx/query-fba1e93b14ac655c9fbba7bab752073f0ae95134781b0804d7bd6c2dbbbc65a8.json
+new file mode 100644
+index 0000000..5ae57d2
+--- /dev/null
++++ b/store/.sqlx/query-fba1e93b14ac655c9fbba7bab752073f0ae95134781b0804d7bd6c2dbbbc65a8.json
+@@ -0,0 +1,65 @@
++{
++  "db_name": "PostgreSQL",
++  "query": "SELECT id, user_id, token_mint, token_symbol, balance, decimals, created_at, updated_at\n             FROM token_balances WHERE user_id = $1 AND token_mint = $2",
++  "describe": {
++    "columns": [
++      {
++        "ordinal": 0,
++        "name": "id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 1,
++        "name": "user_id",
++        "type_info": "Uuid"
++      },
++      {
++        "ordinal": 2,
++        "name": "token_mint",
++        "type_info": "Varchar"
++      },
++      {
++        "ordinal": 3,
++        "name": "token_symbol",
++        "type_info": "Varchar"
++      },
++      {
++        "ordinal": 4,
++        "name": "balance",
++        "type_info": "Numeric"
++      },
++      {
++        "ordinal": 5,
++        "name": "decimals",
++        "type_info": "Int4"
++      },
++      {
++        "ordinal": 6,
++        "name": "created_at",
++        "type_info": "Timestamptz"
++      },
++      {
++        "ordinal": 7,
++        "name": "updated_at",
++        "type_info": "Timestamptz"
++      }
++    ],
++    "parameters": {
++      "Left": [
++        "Uuid",
++        "Text"
++      ]
++    },
++    "nullable": [
++      false,
++      false,
++      false,
++      false,
++      true,
++      false,
++      true,
++      true
++    ]
++  },
++  "hash": "fba1e93b14ac655c9fbba7bab752073f0ae95134781b0804d7bd6c2dbbbc65a8"
++}
+diff --git a/store/Cargo.toml b/store/Cargo.toml
+index f622e5e..bfa536e 100644
+--- a/store/Cargo.toml
++++ b/store/Cargo.toml
+@@ -6,7 +6,7 @@ edition = "2024"
+ [dependencies]
+ uuid = { version = "1.0", features = ["v4","serde"] }
+ chrono = { version = "0.4", features = ["serde"] }
+-sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono"] }
++sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono","bigdecimal","decimal","migrate",] }
+ bcrypt = "0.15"
+ tokio = { version = "1.0", features = ["full"] }
+ rust_decimal = "1.37.2"
+diff --git a/store/src/lib.rs b/store/src/lib.rs
+index e291994..c8555dd 100644
+--- a/store/src/lib.rs
++++ b/store/src/lib.rs
+@@ -1,13 +1,43 @@
++pub mod transaction;
+ pub mod user;
++use std::time::Duration;
+ 
+-use sqlx::PgPool;
++use sqlx::{PgPool, postgres::PgPoolOptions};
+ 
+ pub struct Store {
+     pub pool: PgPool,
+ }
+ 
+ impl Store {
+-    pub fn new(pool: PgPool) -> Self {
+-        Self { pool }
++    pub async fn new(database_url: &str) -> Result<Self, sqlx::Error> {
++        let pool = PgPoolOptions::new()
++            .max_connections(20)
++            .min_connections(5)
++            .acquire_timeout(Duration::from_secs(30))
++            .idle_timeout(Duration::from_secs(600))
++            .max_lifetime(Duration::from_secs(1800))
++            .connect(database_url)
++            .await?;
++
++        Ok(Self { pool })
++    }
++
++    /// Run database migrations
++    pub async fn migrate(&self) -> Result<(), sqlx::migrate::MigrateError> {
++        sqlx::migrate!("./migrations").run(&self.pool).await
++    }
++
++    /// Close the database connection pool
++    pub async fn close(&self) {
++        self.pool.close().await;
++    }
++
++    // Check if the database connection is healthy
++    pub async fn health_check(&self) -> Result<bool, sqlx::Error> {
++        sqlx::query("SELECT 1")
++            .fetch_one(&self.pool)
++            .await
++            .map(|_| true)
++            .or(Ok(false))
+     }
+ }
+diff --git a/store/src/transaction.rs b/store/src/transaction.rs
+new file mode 100644
+index 0000000..62fd7b8
+--- /dev/null
++++ b/store/src/transaction.rs
+@@ -0,0 +1,535 @@
++use crate::Store;
++use crate::user::{StoreError, Transaction, TransactionStatus, TransactionType};
++use chrono::Utc;
++use rust_decimal::Decimal;
++use uuid::Uuid;
++
++impl Store {
++    /// Create a new transaction record
++    pub async fn create_transaction(
++        &self,
++        user_id: Uuid,
++        transaction_type: TransactionType,
++        amount: Decimal,
++        token_mint: Option<String>,
++        from_address: Option<String>,
++        to_address: Option<String>,
++        fee: Option<Decimal>,
++    ) -> Result<Transaction, StoreError> {
++        // Validate that user exists
++        sqlx::query!("SELECT id FROM users WHERE id = $1", user_id)
++            .fetch_optional(&self.pool)
++            .await?
++            .ok_or(StoreError::UserNotFound)?;
++
++        if amount <= Decimal::ZERO {
++            return Err(StoreError::InvalidInput(
++                "Amount must be positive".to_string(),
++            ));
++        }
++
++        let transaction = sqlx::query_as!(
++            Transaction,
++            r#"
++            INSERT INTO transactions (user_id, transaction_type, status, amount, token_mint, from_address, to_address, fee, created_at, updated_at)
++            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $9)
++            RETURNING id, user_id, tx_signature, transaction_type as "transaction_type: TransactionType", 
++                      status as "status: TransactionStatus", amount, token_mint, from_address, to_address, fee, created_at, updated_at
++            "#,
++            user_id,
++            transaction_type as TransactionType,
++            TransactionStatus::Pending as TransactionStatus,
++            amount,
++            token_mint,
++            from_address,
++            to_address,
++            fee.unwrap_or(Decimal::ZERO),
++            Utc::now()
++        )
++        .fetch_one(&self.pool)
++        .await?;
++
++        Ok(transaction)
++    }
++
++    /// Update transaction status and signature
++    pub async fn update_transaction_status(
++        &self,
++        transaction_id: Uuid,
++        status: TransactionStatus,
++        tx_signature: Option<String>,
++    ) -> Result<(), StoreError> {
++        let updated_rows = sqlx::query!(
++            "UPDATE transactions SET status = $1, tx_signature = $2, updated_at = $3 WHERE id = $4",
++            status as TransactionStatus,
++            tx_signature,
++            Utc::now(),
++            transaction_id
++        )
++        .execute(&self.pool)
++        .await?
++        .rows_affected();
++
++        if updated_rows == 0 {
++            return Err(StoreError::InvalidInput(
++                "Transaction not found".to_string(),
++            ));
++        }
++
++        Ok(())
++    }
++
++    pub async fn get_transaction(&self, transaction_id: Uuid) -> Result<Transaction, StoreError> {
++        let transaction = sqlx::query_as!(
++            Transaction,
++            r#"
++            SELECT id, user_id, tx_signature, transaction_type as "transaction_type: TransactionType",
++                   status as "status: TransactionStatus", amount, token_mint, from_address, to_address, fee, created_at, updated_at
++            FROM transactions WHERE id = $1
++            "#,
++            transaction_id
++        )
++        .fetch_optional(&self.pool)
++        .await?
++        .ok_or(StoreError::InvalidInput("Transaction not found".to_string()))?;
++
++        Ok(transaction)
++    }
++
++    /// Get transaction by signature
++    pub async fn get_transaction_by_signature(
++        &self,
++        tx_signature: &str,
++    ) -> Result<Transaction, StoreError> {
++        let transaction = sqlx::query_as!(
++            Transaction,
++            r#"
++            SELECT id, user_id, tx_signature, transaction_type as "transaction_type: TransactionType",
++                   status as "status: TransactionStatus", amount, token_mint, from_address, to_address, fee, created_at, updated_at
++            FROM transactions WHERE tx_signature = $1
++            "#,
++            tx_signature
++        )
++        .fetch_optional(&self.pool)
++        .await?
++        .ok_or(StoreError::InvalidInput("Transaction not found".to_string()))?;
++
++        Ok(transaction)
++    }
++
++    /// Get user transactions with pagination
++    pub async fn get_user_transactions(
++        &self,
++        user_id: Uuid,
++        limit: i64,
++        offset: i64,
++        status_filter: Option<TransactionStatus>,
++        transaction_type_filter: Option<TransactionType>,
++    ) -> Result<Vec<Transaction>, StoreError> {
++        let transactions = match (status_filter, transaction_type_filter) {
++            (Some(status), Some(tx_type)) => {
++                sqlx::query_as!(
++                    Transaction,
++                    r#"
++                    SELECT id, user_id, tx_signature, transaction_type as "transaction_type: TransactionType",
++                           status as "status: TransactionStatus", amount, token_mint, from_address, to_address, fee, created_at, updated_at
++                    FROM transactions 
++                    WHERE user_id = $1 AND status = $2 AND transaction_type = $3
++                    ORDER BY created_at DESC 
++                    LIMIT $4 OFFSET $5
++                    "#,
++                    user_id,
++                    status as TransactionStatus,
++                    tx_type as TransactionType,
++                    limit,
++                    offset
++                )
++                .fetch_all(&self.pool)
++                .await?
++            }
++            (Some(status), None) => {
++                sqlx::query_as!(
++                    Transaction,
++                    r#"
++                    SELECT id, user_id, tx_signature, transaction_type as "transaction_type: TransactionType",
++                           status as "status: TransactionStatus", amount, token_mint, from_address, to_address, fee, created_at, updated_at
++                    FROM transactions 
++                    WHERE user_id = $1 AND status = $2
++                    ORDER BY created_at DESC 
++                    LIMIT $3 OFFSET $4
++                    "#,
++                    user_id,
++                    status as TransactionStatus,
++                    limit,
++                    offset
++                )
++                .fetch_all(&self.pool)
++                .await?
++            }
++            (None, Some(tx_type)) => {
++                sqlx::query_as!(
++                    Transaction,
++                    r#"
++                    SELECT id, user_id, tx_signature, transaction_type as "transaction_type: TransactionType",
++                           status as "status: TransactionStatus", amount, token_mint, from_address, to_address, fee, created_at, updated_at
++                    FROM transactions 
++                    WHERE user_id = $1 AND transaction_type = $2
++                    ORDER BY created_at DESC 
++                    LIMIT $3 OFFSET $4
++                    "#,
++                    user_id,
++                    tx_type as TransactionType,
++                    limit,
++                    offset
++                )
++                .fetch_all(&self.pool)
++                .await?
++            }
++            (None, None) => {
++                sqlx::query_as!(
++                    Transaction,
++                    r#"
++                    SELECT id, user_id, tx_signature, transaction_type as "transaction_type: TransactionType",
++                           status as "status: TransactionStatus", amount, token_mint, from_address, to_address, fee, created_at, updated_at
++                    FROM transactions 
++                    WHERE user_id = $1
++                    ORDER BY created_at DESC 
++                    LIMIT $2 OFFSET $3
++                    "#,
++                    user_id,
++                    limit,
++                    offset
++                )
++                .fetch_all(&self.pool)
++                .await?
++            }
++        };
++
++        Ok(transactions)
++    }
++
++    /// Get pending transactions (for processing)
++    pub async fn get_pending_transactions(
++        &self,
++        limit: i64,
++    ) -> Result<Vec<Transaction>, StoreError> {
++        let transactions = sqlx::query_as!(
++            Transaction,
++            r#"
++            SELECT id, user_id, tx_signature, transaction_type as "transaction_type: TransactionType",
++                   status as "status: TransactionStatus", amount, token_mint, from_address, to_address, fee, created_at, updated_at
++            FROM transactions 
++            WHERE status = $1
++            ORDER BY created_at ASC 
++            LIMIT $2
++            "#,
++            TransactionStatus::Pending as TransactionStatus,
++            limit
++        )
++        .fetch_all(&self.pool)
++        .await?;
++
++        Ok(transactions)
++    }
++
++    /// Count user transactions
++    pub async fn count_user_transactions(
++        &self,
++        user_id: Uuid,
++        status_filter: Option<TransactionStatus>,
++        transaction_type_filter: Option<TransactionType>,
++    ) -> Result<i64, StoreError> {
++        let count = match (status_filter, transaction_type_filter) {
++            (Some(status), Some(tx_type)) => {
++                sqlx::query_scalar!(
++                    "SELECT COUNT(*) FROM transactions WHERE user_id = $1 AND status = $2 AND transaction_type = $3",
++                    user_id,
++                    status as TransactionStatus,
++                    tx_type as TransactionType
++                )
++                .fetch_one(&self.pool)
++                .await?
++                .unwrap_or(0)
++            }
++            (Some(status), None) => {
++                sqlx::query_scalar!(
++                    "SELECT COUNT(*) FROM transactions WHERE user_id = $1 AND status = $2",
++                    user_id,
++                    status as TransactionStatus
++                )
++                .fetch_one(&self.pool)
++                .await?
++                .unwrap_or(0)
++            }
++            (None, Some(tx_type)) => {
++                sqlx::query_scalar!(
++                    "SELECT COUNT(*) FROM transactions WHERE user_id = $1 AND transaction_type = $2",
++                    user_id,
++                    tx_type as TransactionType
++                )
++                .fetch_one(&self.pool)
++                .await?
++                .unwrap_or(0)
++            }
++            (None, None) => {
++                sqlx::query_scalar!(
++                    "SELECT COUNT(*) FROM transactions WHERE user_id = $1",
++                    user_id
++                )
++                .fetch_one(&self.pool)
++                .await?
++                .unwrap_or(0)
++            }
++        };
++
++        Ok(count)
++    }
++
++    /// Get transaction statistics
++    pub async fn get_transaction_stats(&self) -> Result<(i64, i64, i64, Decimal), StoreError> {
++        // Total transactions, pending, failed, total volume
++        let total_transactions = sqlx::query_scalar!("SELECT COUNT(*) FROM transactions")
++            .fetch_one(&self.pool)
++            .await?
++            .unwrap_or(0);
++
++        let pending_count = sqlx::query_scalar!(
++            "SELECT COUNT(*) FROM transactions WHERE status = $1",
++            TransactionStatus::Pending as TransactionStatus
++        )
++        .fetch_one(&self.pool)
++        .await?
++        .unwrap_or(0);
++
++        let failed_count = sqlx::query_scalar!(
++            "SELECT COUNT(*) FROM transactions WHERE status = $1",
++            TransactionStatus::Failed as TransactionStatus
++        )
++        .fetch_one(&self.pool)
++        .await?
++        .unwrap_or(0);
++
++        let total_volume = sqlx::query_scalar!(
++            "SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE status = $1",
++            TransactionStatus::Confirmed as TransactionStatus
++        )
++        .fetch_one(&self.pool)
++        .await?
++        .unwrap_or(Decimal::ZERO);
++
++        Ok((
++            total_transactions,
++            pending_count,
++            failed_count,
++            total_volume,
++        ))
++    }
++
++    /// Process a deposit transaction (updates balance and transaction status)
++    pub async fn process_deposit(
++        &self,
++        transaction_id: Uuid,
++        tx_signature: String,
++    ) -> Result<(), StoreError> {
++        // Use transaction for atomic operation
++        let mut tx = self.pool.begin().await?;
++
++        // Get transaction details
++        let transaction = sqlx::query!(
++            r#"
++            SELECT user_id, amount, token_mint, transaction_type as "transaction_type: TransactionType"
++            FROM transactions WHERE id = $1 AND status = $2
++            "#,
++            transaction_id,
++            TransactionStatus::Pending as TransactionStatus
++        )
++        .fetch_optional(&mut *tx)
++        .await?
++        .ok_or(StoreError::InvalidInput("Pending transaction not found".to_string()))?;
++
++        // Verify it's a deposit transaction
++        if !matches!(transaction.transaction_type, TransactionType::Deposit) {
++            return Err(StoreError::InvalidInput(
++                "Transaction is not a deposit".to_string(),
++            ));
++        }
++
++        // Update balances
++        if let Some(token_mint) = transaction.token_mint {
++            // Token deposit - update token balance
++            sqlx::query!(
++                r#"
++                INSERT INTO token_balances (user_id, token_mint, token_symbol, balance, decimals, created_at, updated_at)
++                VALUES ($1, $2, 'UNKNOWN', $3, 6, $4, $4)
++                ON CONFLICT (user_id, token_mint) 
++                DO UPDATE SET 
++                    balance = token_balances.balance + EXCLUDED.balance,
++                    updated_at = EXCLUDED.updated_at
++                "#,
++                transaction.user_id,
++                token_mint,
++                transaction.amount,
++                Utc::now()
++            )
++            .execute(&mut *tx)
++            .await?;
++        } else {
++            // SOL deposit - update user balance
++            sqlx::query!(
++                "UPDATE users SET balance = balance + $1, updated_at = $2 WHERE id = $3",
++                transaction.amount,
++                Utc::now(),
++                transaction.user_id
++            )
++            .execute(&mut *tx)
++            .await?;
++        }
++
++        // Update transaction status
++        sqlx::query!(
++            "UPDATE transactions SET status = $1, tx_signature = $2, updated_at = $3 WHERE id = $4",
++            TransactionStatus::Confirmed as TransactionStatus,
++            tx_signature,
++            Utc::now(),
++            transaction_id
++        )
++        .execute(&mut *tx)
++        .await?;
++
++        tx.commit().await?;
++        Ok(())
++    }
++
++    /// Process a withdrawal transaction (updates balance and transaction status)
++    pub async fn process_withdrawal(
++        &self,
++        transaction_id: Uuid,
++        tx_signature: String,
++    ) -> Result<(), StoreError> {
++        // Use transaction for atomic operation
++        let mut tx = self.pool.begin().await?;
++
++        // Get transaction details
++        let transaction = sqlx::query!(
++            r#"
++            SELECT user_id, amount, token_mint, transaction_type as "transaction_type: TransactionType"
++            FROM transactions WHERE id = $1 AND status = $2
++            "#,
++            transaction_id,
++            TransactionStatus::Pending as TransactionStatus
++        )
++        .fetch_optional(&mut *tx)
++        .await?
++        .ok_or(StoreError::InvalidInput("Pending transaction not found".to_string()))?;
++
++        // Verify it's a withdrawal transaction
++        if !matches!(transaction.transaction_type, TransactionType::Withdrawal) {
++            return Err(StoreError::InvalidInput(
++                "Transaction is not a withdrawal".to_string(),
++            ));
++        }
++
++        // Check and update balances
++        if let Some(token_mint) = transaction.token_mint {
++            // Token withdrawal - check and update token balance
++            let current_balance = sqlx::query_scalar!(
++                "SELECT balance FROM token_balances WHERE user_id = $1 AND token_mint = $2",
++                transaction.user_id,
++                token_mint
++            )
++            .fetch_optional(&mut *tx)
++            .await?
++            .unwrap_or(Decimal::ZERO);
++
++            if current_balance < transaction.amount {
++                return Err(StoreError::InsufficientBalance);
++            }
++
++            sqlx::query!(
++                "UPDATE token_balances SET balance = balance - $1, updated_at = $2 WHERE user_id = $3 AND token_mint = $4",
++                transaction.amount,
++                Utc::now(),
++                transaction.user_id,
++                token_mint
++            )
++            .execute(&mut *tx)
++            .await?;
++        } else {
++            // SOL withdrawal - check and update user balance
++            let current_balance = sqlx::query_scalar!(
++                "SELECT balance FROM users WHERE id = $1",
++                transaction.user_id
++            )
++            .fetch_one(&mut *tx)
++            .await?;
++
++            if current_balance < transaction.amount {
++                return Err(StoreError::InsufficientBalance);
++            }
++
++            sqlx::query!(
++                "UPDATE users SET balance = balance - $1, updated_at = $2 WHERE id = $3",
++                transaction.amount,
++                Utc::now(),
++                transaction.user_id
++            )
++            .execute(&mut *tx)
++            .await?;
++        }
++
++        // Update transaction status
++        sqlx::query!(
++            "UPDATE transactions SET status = $1, tx_signature = $2, updated_at = $3 WHERE id = $4",
++            TransactionStatus::Confirmed as TransactionStatus,
++            tx_signature,
++            Utc::now(),
++            transaction_id
++        )
++        .execute(&mut *tx)
++        .await?;
++
++        tx.commit().await?;
++        Ok(())
++    }
++
++    /// Mark transaction as failed
++    pub async fn fail_transaction(
++        &self,
++        transaction_id: Uuid,
++        reason: Option<String>,
++    ) -> Result<(), StoreError> {
++        // For failed transactions, we might want to store the failure reason
++        // For now, we'll just update the status
++        let updated_rows = sqlx::query!(
++            "UPDATE transactions SET status = $1, updated_at = $2 WHERE id = $3",
++            TransactionStatus::Failed as TransactionStatus,
++            Utc::now(),
++            transaction_id
++        )
++        .execute(&self.pool)
++        .await?
++        .rows_affected();
++
++        if updated_rows == 0 {
++            return Err(StoreError::InvalidInput(
++                "Transaction not found".to_string(),
++            ));
++        }
++
++        Ok(())
++    }
++
++    /// Calculate user's total transaction fees
++    pub async fn get_user_total_fees(&self, user_id: Uuid) -> Result<Decimal, StoreError> {
++        let total_fees = sqlx::query_scalar!(
++            "SELECT COALESCE(SUM(fee), 0) FROM transactions WHERE user_id = $1 AND status = $2",
++            user_id,
++            TransactionStatus::Confirmed as TransactionStatus
++        )
++        .fetch_one(&self.pool)
++        .await?
++        .unwrap_or(Decimal::ZERO);
++
++        Ok(total_fees)
++    }
++}
+diff --git a/store/src/user.rs b/store/src/user.rs
+index 81089b1..ed01720 100644
+--- a/store/src/user.rs
++++ b/store/src/user.rs
+@@ -1,5 +1,5 @@
+ use crate::Store;
+-use bcrypt::{DEFAULT_COST,verify,hash};
++use bcrypt::{DEFAULT_COST, hash, verify};
+ use chrono::{DateTime, Utc};
+ use rust_decimal::Decimal;
+ use serde::Deserialize;
+@@ -122,6 +122,13 @@ pub enum StoreError {
+     // DatabaseError(#[from] sqlx::Error),
+     EncryptionError(String),
+     PasswordError(String),
++    DatabaseError(sqlx::Error),
++}
++
++impl From<sqlx::Error> for StoreError {
++    fn from(err: sqlx::Error) -> Self {
++        StoreError::DatabaseError(err)
++    }
+ }
+ 
+ // Helper structs for aggregated queries
+@@ -152,10 +159,8 @@ impl std::fmt::Display for UserError {
+ impl std::error::Error for UserError {}
+ 
+ impl Store {
+-
+     //DONE TILL TOKEN balance store impl
+ 
+-
+     pub async fn create_user(&self, request: CreateUserRequest) -> Result<User, StoreError> {
+         // Validate email format
+         if !request.email.contains('@') || request.email.len() < 5 {
+@@ -164,16 +169,15 @@ impl Store {
+ 
+         // Validate password length
+         if request.password.len() < 8 {
+-            return Err(StoreError::InvalidInput("Password must be at least 8 characters".to_string()));
++            return Err(StoreError::InvalidInput(
++                "Password must be at least 8 characters".to_string(),
++            ));
+         }
+ 
+         // Check if user already exists
+-        let existing_user = sqlx::query!(
+-            "SELECT id FROM users WHERE email = $1",
+-            request.email
+-        )
+-        .fetch_optional(&self.pool)
+-        .await?;
++        let existing_user = sqlx::query!("SELECT id FROM users WHERE email = $1", request.email)
++            .fetch_optional(&self.pool)
++            .await?;
+ 
+         if existing_user.is_some() {
+             return Err(StoreError::UserExists);
+@@ -202,7 +206,7 @@ impl Store {
+         Ok(user)
+     }
+ 
+-     pub async fn get_user(&self, user_id: Uuid) -> Result<User, StoreError> {
++    pub async fn get_user(&self, user_id: Uuid) -> Result<User, StoreError> {
+         let user = sqlx::query_as!(
+             User,
+             "SELECT id, email, agg_pubkey, balance, created_at, updated_at FROM users WHERE id = $1",
+@@ -257,9 +261,12 @@ impl Store {
+         })
+     }
+ 
+-    
+     /// Update user's aggregated public key (after MPC key generation)
+-    pub async fn update_user_agg_pubkey(&self, user_id: Uuid, agg_pubkey: &str) -> Result<(), StoreError> {
++    pub async fn update_user_agg_pubkey(
++        &self,
++        user_id: Uuid,
++        agg_pubkey: &str,
++    ) -> Result<(), StoreError> {
+         sqlx::query!(
+             "UPDATE users SET agg_pubkey = $1, updated_at = $2 WHERE id = $3",
+             agg_pubkey,
+@@ -272,21 +279,22 @@ impl Store {
+         Ok(())
+     }
+ 
+-     /// Get user balance (SOL only)
++    /// Get user balance (SOL only)
+     pub async fn get_user_balance(&self, user_id: Uuid) -> Result<Decimal, StoreError> {
+-        let balance = sqlx::query_scalar!(
+-            "SELECT balance FROM users WHERE id = $1",
+-            user_id
+-        )
+-        .fetch_optional(&self.pool)
+-        .await?
+-        .ok_or(StoreError::UserNotFound)?;
++        let balance = sqlx::query_scalar!("SELECT balance FROM users WHERE id = $1", user_id)
++            .fetch_optional(&self.pool)
++            .await?
++            .ok_or(StoreError::UserNotFound)?;
+ 
+         Ok(balance)
+     }
+ 
+     /// Update user SOL balance
+-    pub async fn update_user_balance(&self, user_id: Uuid, new_balance: Decimal) -> Result<(), StoreError> {
++    pub async fn update_user_balance(
++        &self,
++        user_id: Uuid,
++        new_balance: Decimal,
++    ) -> Result<(), StoreError> {
+         let updated_rows = sqlx::query!(
+             "UPDATE users SET balance = $1, updated_at = $2 WHERE id = $3",
+             new_balance,
+@@ -305,9 +313,15 @@ impl Store {
+     }
+ 
+     /// Add to user SOL balance (for deposits)
+-    pub async fn add_user_balance(&self, user_id: Uuid, amount: Decimal) -> Result<Decimal, StoreError> {
++    pub async fn add_user_balance(
++        &self,
++        user_id: Uuid,
++        amount: Decimal,
++    ) -> Result<Decimal, StoreError> {
+         if amount <= Decimal::ZERO {
+-            return Err(StoreError::InvalidInput("Amount must be positive".to_string()));
++            return Err(StoreError::InvalidInput(
++                "Amount must be positive".to_string(),
++            ));
+         }
+ 
+         let new_balance = sqlx::query_scalar!(
+@@ -323,10 +337,16 @@ impl Store {
+         Ok(new_balance)
+     }
+ 
+-     /// Subtract from user SOL balance (for withdrawals)
+-    pub async fn subtract_user_balance(&self, user_id: Uuid, amount: Decimal) -> Result<Decimal, StoreError> {
++    /// Subtract from user SOL balance (for withdrawals)
++    pub async fn subtract_user_balance(
++        &self,
++        user_id: Uuid,
++        amount: Decimal,
++    ) -> Result<Decimal, StoreError> {
+         if amount <= Decimal::ZERO {
+-            return Err(StoreError::InvalidInput("Amount must be positive".to_string()));
++            return Err(StoreError::InvalidInput(
++                "Amount must be positive".to_string(),
++            ));
+         }
+ 
+         // Check current balance first
+@@ -351,7 +371,7 @@ impl Store {
+     /// Get user with summary information
+     pub async fn get_user_summary(&self, user_id: Uuid) -> Result<UserSummary, StoreError> {
+         let user = self.get_user(user_id).await?;
+-        
++
+         let keyshare_count = sqlx::query_scalar!(
+             "SELECT COUNT(*) FROM mpc_keyshares WHERE user_id = $1",
+             user_id
+@@ -376,9 +396,12 @@ impl Store {
+     }
+ 
+     /// Get complete user balance information (SOL + all tokens)
+-    pub async fn get_user_complete_balance(&self, user_id: Uuid) -> Result<UserBalanceResponse, StoreError> {
++    pub async fn get_user_complete_balance(
++        &self,
++        user_id: Uuid,
++    ) -> Result<UserBalanceResponse, StoreError> {
+         let sol_balance = self.get_user_balance(user_id).await?;
+-        
++
+         let token_balances = sqlx::query_as!(
+             TokenBalance,
+             "SELECT id, user_id, token_mint, token_symbol, balance, decimals, created_at, updated_at 
+@@ -412,22 +435,25 @@ impl Store {
+ 
+     /// Get total number of users
+     pub async fn count_users(&self) -> Result<i64, StoreError> {
+-        let count = sqlx::query_scalar!(
+-            "SELECT COUNT(*) FROM users"
+-        )
+-        .fetch_one(&self.pool)
+-        .await?
+-        .unwrap_or(0);
++        let count = sqlx::query_scalar!("SELECT COUNT(*) FROM users")
++            .fetch_one(&self.pool)
++            .await?
++            .unwrap_or(0);
+ 
+         Ok(count)
+     }
+ 
+     // MPC
+ 
+-    pub async fn create_keyshare(&self, request: CreateKeyshareRequest) -> Result<MpcKeyshare, StoreError> {
++    pub async fn create_keyshare(
++        &self,
++        request: CreateKeyshareRequest,
++    ) -> Result<MpcKeyshare, StoreError> {
+         // Validate MPC node ID (assuming nodes 1-5)
+         if request.mpc_node_id < 1 || request.mpc_node_id > 5 {
+-            return Err(StoreError::InvalidInput("MPC node ID must be between 1 and 5".to_string()));
++            return Err(StoreError::InvalidInput(
++                "MPC node ID must be between 1 and 5".to_string(),
++            ));
+         }
+ 
+         // Validate that user exists
+@@ -472,7 +498,11 @@ impl Store {
+     }
+ 
+     /// Get a specific keyshare by user ID and MPC node ID
+-    pub async fn get_keyshare(&self, user_id: Uuid, mpc_node_id: i32) -> Result<MpcKeyshare, StoreError> {
++    pub async fn get_keyshare(
++        &self,
++        user_id: Uuid,
++        mpc_node_id: i32,
++    ) -> Result<MpcKeyshare, StoreError> {
+         let keyshare = sqlx::query_as!(
+             MpcKeyshare,
+             "SELECT id, user_id, mpc_node_id, private_key_share, public_key, threshold, total_shares, created_at, updated_at
+@@ -487,7 +517,7 @@ impl Store {
+         Ok(keyshare)
+     }
+ 
+-     /// Get all keyshares for a specific user
++    /// Get all keyshares for a specific user
+     pub async fn get_user_keyshares(&self, user_id: Uuid) -> Result<Vec<MpcKeyshare>, StoreError> {
+         let keyshares = sqlx::query_as!(
+             MpcKeyshare,
+@@ -502,7 +532,10 @@ impl Store {
+     }
+ 
+     /// Get all keyshares for a specific MPC node (for node operators)
+-    pub async fn get_node_keyshares(&self, mpc_node_id: i32) -> Result<Vec<MpcKeyshare>, StoreError> {
++    pub async fn get_node_keyshares(
++        &self,
++        mpc_node_id: i32,
++    ) -> Result<Vec<MpcKeyshare>, StoreError> {
+         if mpc_node_id < 1 || mpc_node_id > 5 {
+             return Err(StoreError::InvalidInput("Invalid MPC node ID".to_string()));
+         }
+@@ -520,7 +553,12 @@ impl Store {
+     }
+ 
+     /// Update keyshare private key (for key refresh operations)
+-    pub async fn update_keyshare(&self, user_id: Uuid, mpc_node_id: i32, new_private_key_share: &str) -> Result<(), StoreError> {
++    pub async fn update_keyshare(
++        &self,
++        user_id: Uuid,
++        mpc_node_id: i32,
++        new_private_key_share: &str,
++    ) -> Result<(), StoreError> {
+         let updated_rows = sqlx::query!(
+             "UPDATE mpc_keyshares SET private_key_share = $1, updated_at = $2 
+              WHERE user_id = $3 AND mpc_node_id = $4",
+@@ -541,9 +579,13 @@ impl Store {
+     }
+ 
+     /// Check if user has minimum required keyshares for operations
+-    pub async fn has_sufficient_keyshares(&self, user_id: Uuid, required_threshold: Option<i32>) -> Result<bool, StoreError> {
++    pub async fn has_sufficient_keyshares(
++        &self,
++        user_id: Uuid,
++        required_threshold: Option<i32>,
++    ) -> Result<bool, StoreError> {
+         let threshold = required_threshold.unwrap_or(2);
+-        
++
+         let keyshare_count = sqlx::query_scalar!(
+             "SELECT COUNT(*) FROM mpc_keyshares WHERE user_id = $1",
+             user_id
+@@ -555,37 +597,36 @@ impl Store {
+         Ok(keyshare_count >= threshold as i64)
+     }
+ 
+-     /// Get keyshare statistics for monitoring
++    /// Get keyshare statistics for monitoring
+     pub async fn get_keyshare_stats(&self) -> Result<(i64, i64, i64), StoreError> {
+         // Total keyshares, unique users with keyshares, active nodes
+-        let total_keyshares = sqlx::query_scalar!(
+-            "SELECT COUNT(*) FROM mpc_keyshares"
+-        )
+-        .fetch_one(&self.pool)
+-        .await?
+-        .unwrap_or(0);
++        let total_keyshares = sqlx::query_scalar!("SELECT COUNT(*) FROM mpc_keyshares")
++            .fetch_one(&self.pool)
++            .await?
++            .unwrap_or(0);
+ 
+-        let unique_users = sqlx::query_scalar!(
+-            "SELECT COUNT(DISTINCT user_id) FROM mpc_keyshares"
+-        )
+-        .fetch_one(&self.pool)
+-        .await?
+-        .unwrap_or(0);
++        let unique_users = sqlx::query_scalar!("SELECT COUNT(DISTINCT user_id) FROM mpc_keyshares")
++            .fetch_one(&self.pool)
++            .await?
++            .unwrap_or(0);
+ 
+-        let active_nodes = sqlx::query_scalar!(
+-            "SELECT COUNT(DISTINCT mpc_node_id) FROM mpc_keyshares"
+-        )
+-        .fetch_one(&self.pool)
+-        .await?
+-        .unwrap_or(0);
++        let active_nodes =
++            sqlx::query_scalar!("SELECT COUNT(DISTINCT mpc_node_id) FROM mpc_keyshares")
++                .fetch_one(&self.pool)
++                .await?
++                .unwrap_or(0);
+ 
+         Ok((total_keyshares, unique_users, active_nodes))
+     }
+ 
+-     /// Batch create keyshares for a user across multiple nodes (for initial setup)
+-    pub async fn create_user_keyshares_batch(&self, user_id: Uuid, keyshares: Vec<(i32, String, String)>) -> Result<Vec<MpcKeyshare>, StoreError> {
++    /// Batch create keyshares for a user across multiple nodes (for initial setup)
++    pub async fn create_user_keyshares_batch(
++        &self,
++        user_id: Uuid,
++        keyshares: Vec<(i32, String, String)>,
++    ) -> Result<Vec<MpcKeyshare>, StoreError> {
+         // keyshares format: (mpc_node_id, private_key_share, public_key)
+-        
++
+         // Validate that user exists
+         sqlx::query!("SELECT id FROM users WHERE id = $1", user_id)
+             .fetch_optional(&self.pool)
+@@ -593,14 +634,17 @@ impl Store {
+             .ok_or(StoreError::UserNotFound)?;
+ 
+         let mut created_keyshares = Vec::new();
+-        
++
+         // Use transaction for atomic batch creation
+         let mut tx = self.pool.begin().await?;
+-        
++
+         for (mpc_node_id, private_key_share, public_key) in keyshares {
+             // Validate MPC node ID
+             if mpc_node_id < 1 || mpc_node_id > 5 {
+-                return Err(StoreError::InvalidInput(format!("Invalid MPC node ID: {}", mpc_node_id)));
++                return Err(StoreError::InvalidInput(format!(
++                    "Invalid MPC node ID: {}",
++                    mpc_node_id
++                )));
+             }
+ 
+             let keyshare = sqlx::query_as!(
+@@ -623,15 +667,19 @@ impl Store {
+ 
+             created_keyshares.push(keyshare);
+         }
+-        
++
+         tx.commit().await?;
+         Ok(created_keyshares)
+     }
+ 
+     // Token balance
+ 
+-     /// Get token balance for a specific user and token
+-    pub async fn get_token_balance(&self, user_id: Uuid, token_mint: &str) -> Result<Decimal, StoreError> {
++    /// Get token balance for a specific user and token
++    pub async fn get_token_balance(
++        &self,
++        user_id: Uuid,
++        token_mint: &str,
++    ) -> Result<Decimal, StoreError> {
+         let balance = sqlx::query_scalar!(
+             "SELECT balance FROM token_balances WHERE user_id = $1 AND token_mint = $2",
+             user_id,
+@@ -645,7 +693,10 @@ impl Store {
+     }
+ 
+     /// Get all token balances for a user
+-    pub async fn get_user_token_balances(&self, user_id: Uuid) -> Result<Vec<TokenBalance>, StoreError> {
++    pub async fn get_user_token_balances(
++        &self,
++        user_id: Uuid,
++    ) -> Result<Vec<TokenBalance>, StoreError> {
+         let token_balances = sqlx::query_as!(
+             TokenBalance,
+             "SELECT id, user_id, token_mint, token_symbol, balance, decimals, created_at, updated_at
+@@ -660,12 +711,12 @@ impl Store {
+ 
+     /// Create or update token balance for a user
+     pub async fn update_token_balance(
+-        &self, 
+-        user_id: Uuid, 
+-        token_mint: &str, 
+-        token_symbol: &str, 
++        &self,
++        user_id: Uuid,
++        token_mint: &str,
++        token_symbol: &str,
+         balance: Decimal,
+-        decimals: i32
++        decimals: i32,
+     ) -> Result<TokenBalance, StoreError> {
+         // Validate that user exists
+         sqlx::query!("SELECT id FROM users WHERE id = $1", user_id)
+@@ -699,16 +750,17 @@ impl Store {
+         Ok(token_balance)
+     }
+ 
+-
+     /// Add to token balance (for deposits)
+     pub async fn add_token_balance(
+-        &self, 
+-        user_id: Uuid, 
+-        token_mint: &str, 
+-        amount: Decimal
++        &self,
++        user_id: Uuid,
++        token_mint: &str,
++        amount: Decimal,
+     ) -> Result<Decimal, StoreError> {
+         if amount <= Decimal::ZERO {
+-            return Err(StoreError::InvalidInput("Amount must be positive".to_string()));
++            return Err(StoreError::InvalidInput(
++                "Amount must be positive".to_string(),
++            ));
+         }
+ 
+         // Check if token balance record exists
+@@ -722,7 +774,8 @@ impl Store {
+ 
+         if existing_balance.is_none() {
+             return Err(StoreError::InvalidInput(
+-                "Token balance record not found. Create it first with upsert_token_balance".to_string()
++                "Token balance record not found. Create it first with update_token_balance"
++                    .to_string(),
+             ));
+         }
+ 
+@@ -743,13 +796,15 @@ impl Store {
+ 
+     /// Subtract from token balance (for withdrawals)
+     pub async fn subtract_token_balance(
+-        &self, 
+-        user_id: Uuid, 
+-        token_mint: &str, 
+-        amount: Decimal
++        &self,
++        user_id: Uuid,
++        token_mint: &str,
++        amount: Decimal,
+     ) -> Result<Decimal, StoreError> {
+         if amount <= Decimal::ZERO {
+-            return Err(StoreError::InvalidInput("Amount must be positive".to_string()));
++            return Err(StoreError::InvalidInput(
++                "Amount must be positive".to_string(),
++            ));
+         }
+ 
+         // Check current balance first
+@@ -769,13 +824,19 @@ impl Store {
+         )
+         .fetch_optional(&self.pool)
+         .await?
+-        .ok_or(StoreError::InvalidInput("Token balance record not found".to_string()))?;
++        .ok_or(StoreError::InvalidInput(
++            "Token balance record not found".to_string(),
++        ))?;
+ 
+         Ok(new_balance)
+     }
+ 
+     /// Get token balance with full token information
+-    pub async fn get_token_balance_info(&self, user_id: Uuid, token_mint: &str) -> Result<TokenBalance, StoreError> {
++    pub async fn get_token_balance_info(
++        &self,
++        user_id: Uuid,
++        token_mint: &str,
++    ) -> Result<TokenBalance, StoreError> {
+         let token_balance = sqlx::query_as!(
+             TokenBalance,
+             "SELECT id, user_id, token_mint, token_symbol, balance, decimals, created_at, updated_at
+@@ -785,7 +846,9 @@ impl Store {
+         )
+         .fetch_optional(&self.pool)
+         .await?
+-        .ok_or(StoreError::InvalidInput("Token balance not found".to_string()))?;
++        .ok_or(StoreError::InvalidInput(
++            "Token balance not found".to_string(),
++        ))?;
+ 
+         Ok(token_balance)
+     }
+@@ -799,14 +862,16 @@ impl Store {
+         amount: Decimal,
+     ) -> Result<(Decimal, Decimal), StoreError> {
+         if amount <= Decimal::ZERO {
+-            return Err(StoreError::InvalidInput("Transfer amount must be positive".to_string()));
++            return Err(StoreError::InvalidInput(
++                "Transfer amount must be positive".to_string(),
++            ));
+         }
+ 
+         // Use transaction for atomic transfer
+         let mut tx = self.pool.begin().await?;
+ 
+         // Check sender balance
+-        let sender_balance = sqlx::query_scalar!(
++        let sender_balance: Decimal = sqlx::query_scalar!(
+             "SELECT balance FROM token_balances WHERE user_id = $1 AND token_mint = $2",
+             from_user_id,
+             token_mint
+@@ -855,5 +920,23 @@ impl Store {
+         Ok((new_sender_balance, new_receiver_balance))
+     }
+ 
+-
++    /// Delete zero balance token records (cleanup)
++    pub async fn cleanup_zero_balances(&self, user_id: Option<Uuid>) -> Result<u64, StoreError> {
++        let deleted_count = if let Some(user_id) = user_id {
++            sqlx::query!(
++                "DELETE FROM token_balances WHERE user_id = $1 AND balance = 0",
++                user_id
++            )
++            .execute(&self.pool)
++            .await?
++            .rows_affected()
++        } else {
++            sqlx::query!("DELETE FROM token_balances WHERE balance = 0")
++                .execute(&self.pool)
++                .await?
++                .rows_affected()
++        };
++
++        Ok(deleted_count)
++    }
+ }
+-- 
+2.43.0
+
